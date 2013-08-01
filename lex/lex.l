@@ -44,11 +44,12 @@ NEWLINE [\n\r]
 <INCOMMENT>
 { 
     "*/"        BEGIN(INITIAL);
-    [^*\n]+
+    [^*\n]+                   ;
+    {NEWLINE}+                ;
 }
 <INSTRING>
 {
     ["\""]          BEGIN(INITIAL);
-    [^\n]+
+    [^\n]+                        ;
 }
 %%
