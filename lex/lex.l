@@ -63,7 +63,7 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 <INSTRING>
 {
     "\"" {printf("back to INITIAL\n"); BEGIN(INITIAL);}
-    [ˆ*] {printf("qualquer merda \n");}
+    . 	 {printf("append string: %s \n", yytext);}
 }
 %%
 
