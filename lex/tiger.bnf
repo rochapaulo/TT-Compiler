@@ -1,0 +1,45 @@
+program ::=
+        exp
+        |decs
+
+exp ::=
+        #Array and record creations
+        []{[]}
+
+        #Variables, fild, elements of an array
+        |lvalue
+
+        #Function call
+        |id([exp { , exp }])
+	|print {<"string">[,exp]}
+
+	#Operations
+	|-exp
+	|exp op exp
+	|(exps)
+
+	#Assignment
+	|lvalue:=exp
+
+	#Control structures
+	|if exp then exp [else exp]
+	|for id:=exp to exp do exp
+	|while exp do exp
+	|break
+	|return exp
+
+lvalue ::= id
+	|lvalue[ exp ]{[ exp ]}
+
+exps ::= [ exp {; exp }]
+
+decs ::= { dec }
+
+dec ::=
+	#Function declaration
+	|id( tyfields ) = exp
+
+	#Importing a set of declarations
+	|import <id>
+
+op ::= + | - | * | / | = | <> | > | < | >= | <= | and | or

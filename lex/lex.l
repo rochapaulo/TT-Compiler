@@ -1,6 +1,12 @@
 %{
     #include <stdio.h>
-    char *str;
+    #include <string.h>
+
+    char *str_ptr;
+    int number;
+
+    void initString();
+    void appendString(char *text);
 %}
 LETTER [a-zA-Z]
 DIGIT [0-9]
@@ -24,6 +30,8 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 %s AND
 %s OR
 %s IDENTIFIER
+%s NUMBER
+%s STRING
 %%
 <INITIAL>
 {
@@ -47,28 +55,55 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     "="        	 {printf("Saw an: %s\n", yytext); return('=');}
     ">"        	 {printf("Saw an: %s\n", yytext); return('>');}
     "<"       	 {printf("Saw an: %s\n", yytext); return('<');}
+    "{" 	 {printf("Saw an: %s\n", yytext); return('{');}
+    "}" 	 {printf("Saw an: %s\n", yytext); return('}');}
+    "[" 	 {printf("Saw an: %s\n", yytext); return('[');}
+    "]" 	 {printf("Saw an: %s\n", yytext); return(']');}
     {IDENTIFIER} {printf("Identifier: %s\n", yytext); return(IDENTIFIER);}
-    {DIGIT}+     {printf("Digit: %s\n", yytext); return(atoi(yytext));}
+    {DIGIT}+     {printf("Digit: %s\n", yytext); number = atoi(yytext); return(NUMBER);}
     {WHITESPACE}+ ;
     {NEWLINE}+    ;
     "/*" 	 {printf("INCOMMENT\n"); BEGIN(INCOMMENT);}
-    "\"" 	 {printf("INSTRING\n"); BEGIN(INSTRING);}
+    "\""	 initString();
     . 		 printf("invalid token.");
 }
 <INCOMMENT>
 {
+
     "*/" {printf("back to INITIAL\n"); BEGIN(INITIAL);}
-    [^*\n]+            ;
+    "[^*\n]+"           ;
+
 }
 <INSTRING>
-{
-    "\"" {printf("back to INITIAL\n"); BEGIN(INITIAL);}
-    . 	 {printf("append string: %s \n", yytext);}
+{ 
+   "\\\"" appendString("\""); 
+   "\""   {printf("string: %s\n", str_ptr); return(STRING);}
+   .	 appendString(yytext);
 }
+
 %%
 
-int main(void)
-{
+int main(void) {
     yylex();
     return 0;
 }
+
+void initString() {
+    printf("INSTRING\n");
+    
+    str_ptr = malloc(sizeof(char)*1);
+    str_ptr[0] = '\0';
+
+    BEGIN(INSTRING);
+}
+
+void appendString(char *text) {
+    //printf("append string: %s - ", text);
+    char *aux;
+    aux = malloc(strlen(str_ptr)+strlen(text)+1);
+    strcat(aux, str_ptr);
+    strcat(aux, text);
+    //printf("parcial string: %s\n", aux);
+    str_ptr = aux;
+}
+
