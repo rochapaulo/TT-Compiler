@@ -1,8 +1,10 @@
 %option noyywrap
 %{
     #include <string>
+
     using namespace std;
-    string aux;
+
+    string aux = "";
 
     extern "C" int yywrap(){ }
 %}
@@ -27,12 +29,15 @@ NEWLINE [\n\r]
 "+"                                   { return(PLUS);       }
 "-"                                   { return(MINUS);      }
 "*"                                   { return(MULT);       }
+"/"                                   { return(DIV);        }
 "="                                   { return(EQUAL);      }
 "<>"                                  { return(DIFF);       }
 ">"                                   { return(G_OP);       }
 "<"                                   { return(L_OP);       }
 ">="                                  { return(GE_OP);      }
 "<="                                  { return(LE_OP);      }
+"and"                                 { return(AND);        }
+"or"                                  { return(OR);         }
 "("                                   { return(L_PAREN);    }
 ")"                                   { return(R_PAREN);    }
 "["                                   { return(L_BRACKET);  }
@@ -40,12 +45,15 @@ NEWLINE [\n\r]
 "{"                                   { return(L_BRACE);    }
 "}"                                   { return(R_BRACE);    }
 ({LETTER}|_)({LETTER}|{DIGIT}|_)*     { return(IDENTIFIER); }
-{DIGIT}+                              { return(NUMBER);     }
+[+|-]?{DIGIT}+                        { return(NUMBER);     }
 "/*"                                  { BEGIN(IN_COMMENT);  }
-"\""                                  { aux=""; BEGIN(IN_STRING); return(IDENTIFIER); }
+"\""                                  { aux=""; 
+                                        BEGIN(IN_STRING);          
+                                        return(IDENTIFIER); 
+                                      }
 {WHITESPACE}+                         ;
 {NEWLINE}+                            ;
-.                                     { printMessage("Invalid Identifier!"); yyterminate(); }
+.                                     { yyterminate(); }
 
 <IN_COMMENT>
 {
@@ -56,7 +64,7 @@ NEWLINE [\n\r]
 <IN_STRING>
 {
     "\\\"" { (aux = aux + yytext); }
-    "\""   { BEGIN(INITIAL);       }
+    "\""   { return(STRING);       }
     .      { (aux = aux + yytext); }
 }
 %%
