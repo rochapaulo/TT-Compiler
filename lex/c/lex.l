@@ -7,6 +7,7 @@
 
     void initString();
     void appendString(char *text);
+    void printMessage(char *str);
 %}
 LETTER [a-zA-Z]
 DIGIT [0-9]
@@ -35,50 +36,51 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 %%
 <INITIAL>
 {
-    "if"      	 {printf("Saw an: %s\n", yytext); return(IF);}
-    "then"    	 {printf("Saw an: %s\n", yytext); return(THEN);}
-    "else"     	 {printf("Saw an: %s\n", yytext); return(ELSE);}
-    "for"      	 {printf("Saw an: %s\n", yytext); return(FOR);}
-    "to"       	 {printf("Saw an: %s\n", yytext); return(TO);}
-    "do"       	 {printf("Saw an: %s\n", yytext); return(DO);}
-    "while"    	 {printf("Saw an: %s\n", yytext); return(WHILE);}
-    "break"    	 {printf("Saw an: %s\n", yytext); return(BREAK);}
-    "<>"       	 {printf("Saw an: %s\n", yytext); return(OP_DIF);}
-    ">="       	 {printf("Saw an: %s\n", yytext); return(OP_GE);}
-    "<="         {printf("Saw an: %s\n", yytext); return(OP_LE);}
-    "and"      	 {printf("Saw an: %s\n", yytext); return(AND);}
-    "or"       	 {printf("Saw an: %s\n", yytext); return(OR);}
-    "+"        	 {printf("Saw an: %s\n", yytext); return('+');}
-    "-"        	 {printf("Saw an: %s\n", yytext); return('-');}
-    "*"        	 {printf("Saw an: %s\n", yytext); return('*');}
-    "/"        	 {printf("Saw an: %s\n", yytext); return('/');}
-    "="        	 {printf("Saw an: %s\n", yytext); return('=');}
-    ">"        	 {printf("Saw an: %s\n", yytext); return('>');}
-    "<"       	 {printf("Saw an: %s\n", yytext); return('<');}
-    "{" 	 {printf("Saw an: %s\n", yytext); return('{');}
-    "}" 	 {printf("Saw an: %s\n", yytext); return('}');}
-    "[" 	 {printf("Saw an: %s\n", yytext); return('[');}
-    "]" 	 {printf("Saw an: %s\n", yytext); return(']');}
-    {IDENTIFIER} {printf("Identifier: %s\n", yytext); return(IDENTIFIER);}
-    {DIGIT}+     {printf("Digit: %s\n", yytext); number = atoi(yytext); return(NUMBER);}
-    {WHITESPACE}+ ;
-    {NEWLINE}+    ;
-    "/*" 	 {printf("INCOMMENT\n"); BEGIN(INCOMMENT);}
-    "\""	 initString();
-    . 		 printf("invalid token.");
+    "if"      	    {printMessage("<IF>");      return(IF);}
+    "then"    	    {printMessage("<THEN>");    return(THEN);}
+    "else"     	    {printMessage("<ELSE>");    return(ELSE);}
+    "for"      	    {printMessage("<FOR>");     return(FOR);}
+    "to"       	    {printMessage("<TO>");      return(TO);}
+    "do"       	    {printMessage("<DO>");      return(DO);}
+    "while"    	    {printMessage("<WHILE>");   return(WHILE);}
+    "break"    	    {printMessage("<BREAK>");   return(BREAK);}
+    "<>"       	    {printMessage("<OP_DIFF>"); return(OP_DIF);}
+    ">="       	    {printMessage("<OP_GE>");   return(OP_GE);}
+    "<="            {printMessage("<OP_LE>");   return(OP_LE);}
+    "and"      	    {printMessage("<AND>");     return(AND);}
+    "or"       	    {printMessage("<OR>");      return(OR);}
+    "+"        	    {printMessage("<PLUS>");    return('+');}
+    "-"        	    {printMessage("<MINUS>");   return('-');}
+    "*"        	    {printMessage("<MUL>");     return('*');}
+    "/"        	    {printMessage("<DIV>");     return('/');}
+    "="        	    {printMessage("<EQUAL>");   return('=');}
+    ">"        	    {printMessage("<OP_G>");    return('>');}
+    "<"       	    {printMessage("<OP_L>");    return('<');}
+    "{"     	    {printMessage("<L_BRACE>"); return('{');}
+    "}" 	    {printMessage("<R_BRACE>"); return('}');}
+    "[" 	    {printMessage("<L_BRACKET>");   return('[');}
+    "]" 	    {printMessage("<R_BRACKET>");   return(']');}
+    "(" 	    {printMessage("<L_PAREN>"); return('(');}
+    ")" 	    {printMessage("<R_PAREN>"); return(')');}
+    {IDENTIFIER}    {printMessage("<IDENTIFIER>"); return(IDENTIFIER);}
+    ([+|-]?){DIGIT}+  {printMessage("<NUMBER>"); number = atoi(yytext); return(NUMBER);}
+    {WHITESPACE}+   ;
+    {NEWLINE}+      ;
+    "/*" 	    {BEGIN(INCOMMENT);}
+    "\""	    {initString();}
+    . 		    printf("INVALID TOKEN");
 }
 <INCOMMENT>
 {
-
-    "*/" {printf("back to INITIAL\n"); BEGIN(INITIAL);}
+    "*/" {BEGIN(INITIAL);}
     "[^*\n]+"           ;
 
 }
 <INSTRING>
 { 
    "\\\"" appendString("\""); 
-   "\""   {printf("string: %s\n", str_ptr); return(STRING);}
-   .	 appendString(yytext);
+   "\""   {printMessage("<STRING>"); return(STRING);}
+   .	  appendString(yytext);
 }
 
 %%
@@ -89,21 +91,20 @@ int main(void) {
 }
 
 void initString() {
-    printf("INSTRING\n");
-    
-    str_ptr = malloc(sizeof(char)*1);
+    str_ptr = malloc(sizeof(char) * 1);
     str_ptr[0] = '\0';
-
     BEGIN(INSTRING);
 }
 
 void appendString(char *text) {
-    //printf("append string: %s - ", text);
     char *aux;
-    aux = malloc(strlen(str_ptr)+strlen(text)+1);
+    aux = malloc(strlen(str_ptr) + strlen(text) + 1);
     strcat(aux, str_ptr);
     strcat(aux, text);
-    //printf("parcial string: %s\n", aux);
     str_ptr = aux;
+}
+
+void printMessage(char *str){
+	printf("%s\n", str);
 }
 
