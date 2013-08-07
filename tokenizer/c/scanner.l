@@ -72,11 +72,6 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 
 %%
 
-int main(void) {
-    yylex();
-    return 0;
-}
-
 void initString() {
     str_ptr = malloc(sizeof(char) * 1);
     str_ptr[0] = '\0';
