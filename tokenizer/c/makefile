@@ -1,17 +1,18 @@
-CC = gcc
-LD = gcc
+CC = clang
+BISON = bison
+FLEX = flex
 PROGRAM = parser
 
 all: $(PROGRAM) clean
 
 parser.tab.c: parser.y
-	bison -d parser.y
+	$(BISON) -d parser.y
 
 lex.yy.c: scanner.l
-	flex scanner.l
+	$(FLEX) scanner.l
 
 parser: parser.tab.c parser.tab.h lex.yy.c
-	gcc parser.tab.c lex.yy.c -ll -o parser
+	$(CC) parser.tab.c lex.yy.c -ll -o parser
 
 clean:
 	rm -rf *.c *.h

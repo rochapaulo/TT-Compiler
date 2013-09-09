@@ -26,7 +26,7 @@ int yywrap(void){
     return 1;
 }
 
-int main(int argc, char * argv) {
+int main(int argc, char ** argv) {
     yyparse();
     return 0;
 }
