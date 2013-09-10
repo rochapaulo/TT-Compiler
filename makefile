@@ -1,22 +1,22 @@
-CC = clang
-BISON = bison
-FLEX = flex
+CC = clang++
+BISON = bison++
+FLEX = flex++
 EXEC = parser
 
 all: $(EXEC) clean
 
-parser.tab.c: parser.y
-	$(BISON) -d parser.y
+parser.cc: parser.y
+	$(BISON) -d -o parser.cc parser.y
 
-lex.yy.c: scanner.l
+lex.yy.cc: scanner.l
 	$(FLEX) scanner.l
 
-parser: parser.tab.c parser.tab.h lex.yy.c
-	$(CC) parser.tab.c lex.yy.c -ll -o parser
+parser: parser.cc lex.yy.cc
+	$(CC) -o parser parser.cc lex.yy.cc main.cpp
 
 install: all
 	@mkdir build
 	@mv $(EXEC) build
 
 clean:
-	rm -rf *.c *.h
+	rm -rf *.cc *.h

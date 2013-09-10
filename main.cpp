@@ -1,10 +1,8 @@
 #include <iostream>
-
 using namespace std;
+extern int yyparse();
 
-int main()
-{
-    cout << "Hello World!" << endl;
+int main(int argc, char **argv) {
+    yyparse();
     return 0;
 }
-

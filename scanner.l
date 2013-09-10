@@ -1,7 +1,7 @@
 %{
     #include <stdio.h>
     #include <string.h>
-    #include "parser.tab.h"
+    #include "parser.h"
     char *str_ptr;
     int number;
 

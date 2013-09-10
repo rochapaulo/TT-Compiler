@@ -21,12 +21,3 @@ parser :
 	IF 	{ printf("Bison found an <IF>\n"); }
 	| THEN  { printf("Bison found an <THEN>\n"); }
 %%
-
-int yywrap(void){
-    return 1;
-}
-
-int main(int argc, char ** argv) {
-    yyparse();
-    return 0;
-}
