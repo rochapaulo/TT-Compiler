@@ -1,13 +1,18 @@
 %{
-    #include <stdio.h>
-    #include <string.h>
+    #include <string>
+    #include "Node.h"
     #include "parser.h"
-    char *str_ptr;
+
+    using namespace std;    
+
+    string myStr;
+   
     int number;
 
     void initString();
     void appendString(char *text);
     void printMessage(char *str);
+
 %}
 LETTER [a-zA-Z]
 DIGIT [0-9]
@@ -44,17 +49,17 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     ">"        	     return(OPG);
     "<"       	     return(OPL);
     "{"     	     return(LBRACE);
-    "}" 	     return(RBRACE);
-    "[" 	     return(LBRACKET);
+    "}" 	         return(RBRACE);
+    "[" 	         return(LBRACKET);
     "]"              return(RBRACKET);
-    "(" 	     return(LPAREN);
-    ")"  	     return(RPAREN);
-    {IDENTIFIER}     { yylval.t_string = yytext; return(IDENTIFIER);   }
+    "(" 	         return(LPAREN);
+    ")"  	         return(RPAREN);
+    {IDENTIFIER}     { *(yylval.t_string) = yytext; return(IDENTIFIER); }
     ([+|-]?){DIGIT}+ { yylval.t_number = atoi(yytext); return(NUMBER); }
     {WHITESPACE}+   ;
     {NEWLINE}+      ;
     "/*" 	    BEGIN(INCOMMENT);
-    "\""	    initString();
+    "\""	    myStr = "";
     . 		    yyterminate();
 }
 <INCOMMENT>
@@ -65,24 +70,8 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 }
 <INSTRING>
 { 
-   "\\\""  appendString("\""); 
-   "\""    { yylval.t_string = str_ptr; return(STRING); }
-   .	   appendString(yytext);
+   "\\\""  myStr = (myStr + "\"");
+   "\""    { *(yylval.t_string) = myStr; return(STRING); }
+   .	   myStr = (myStr + yytext);
 }
-
 %%
-
-void initString() {
-    str_ptr = malloc(sizeof(char) * 1);
-    str_ptr[0] = '\0';
-    BEGIN(INSTRING);
-}
-
-void appendString(char *text) {
-    char *aux;
-    aux = malloc(strlen(str_ptr) + strlen(text) + 1);
-    strcat(aux, str_ptr);
-    strcat(aux, text);
-    str_ptr = aux;
-}
-
