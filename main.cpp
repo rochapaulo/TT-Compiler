@@ -7,7 +7,7 @@ extern int yyparse();
 
 int main(int argc, char **argv) {
     yyparse();
-    cout << "blabla" << endl;
+    cout << "Hello World!" << endl;
     cout << root << endl;
     return 0;
 }
