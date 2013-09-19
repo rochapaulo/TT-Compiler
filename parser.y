@@ -8,13 +8,15 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 %union {
     Node* node;
     NExpression* exp;
+    NStatement* stm;
     int token;
     int t_number;
     string *t_string;
 }
 
-/*     Definição dos símbolos não-terminais (tokens)
- */
+/*     
+      Definição dos símbolos não-terminais (tokens)
+*/
 %token <token> IF THEN ELSE FOR TO DO WHILE BREAK PRINT
 %token <token> PLUS MINUS MUL DIV EQUAL OPDIF OPGE OPLE OPG OPL AND OR
 %token <token> LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
@@ -22,22 +24,27 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 %token <t_number> NUMBER
 
 
-/*     Definição dos tipos dos símbolos não-terminais
+/*     
+      Definição dos tipos dos símbolos não-terminais
 */
 %type <exp> exp
 %type <token> binop
 
 
-/*    Precedência de operadores Matemáticos
+/*    
+      Precedência de operadores Matemáticos
 */
 %left PLUS MINUS
 %left MUL DIV
 
-
+%start program
 /*
       Regras da Gramática
 */
 %%
+    program : exp   { root = $1; }
+	    ;
+
     exp : WHILE exp DO exp { $$ = new NWhile(*$2, *$4) }
 	| exp binop exp    { $$ = new NBinaryOperator(*$1, $2, *$3); }
 	| NUMBER           { $$ = new NInteger($1);  }
