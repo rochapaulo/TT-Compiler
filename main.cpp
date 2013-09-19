@@ -8,6 +8,5 @@ extern int yyparse();
 int main(int argc, char **argv) {
     yyparse();
     cout << "Hello World!" << endl;
-    cout << root << endl;
     return 0;
 }
