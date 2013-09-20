@@ -48,8 +48,13 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
     exp : WHILE exp DO exp { $$ = new NWhile(*$2, *$4) }
 	| exp binop exp    { $$ = new NBinaryOperator(*$1, $2, *$3); }
 	| NUMBER           { $$ = new NInteger($1);  }
-	;
+	/*| IF exp THEN exp  { $$ = new NIf(*$2,*$4, NULL); }*/
+	| IF exp THEN exp ELSE exp { $$ = new NIf(*$2, *$4, *$6); }
+	
 
-    binop : PLUS | MINUS | MUL | DIV
+    binop : PLUS { $$ = PLUS; }
+          | MINUS { $$ = MINUS; }
+	  | MUL { $$ = MUL; }
+	  | DIV { $$ = DIV; }
 	  ;
 %%
