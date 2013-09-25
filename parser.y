@@ -27,13 +27,13 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 /*     
       Definição dos tipos dos símbolos não-terminais
 */
-%type <exp> exp
-%type <token> binop
-
-
+%type <exp> exp;
+%type <exp> term;
+%type <token> binop;
 /*    
       Precedência de operadores Matemáticos
 */
+%left OPLE OPL OPGE OPG EQUAL
 %left PLUS MINUS
 %left MUL DIV
 
@@ -42,19 +42,23 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
       Regras da Gramática
 */
 %%
-    program : exp   { root = $1; }
-	    ;
+    program : exp { root = $1; }
+            ;
 
-    exp : WHILE exp DO exp { $$ = new NWhile(*$2, *$4) }
-	| exp binop exp    { $$ = new NBinaryOperator(*$1, $2, *$3); }
-	| NUMBER           { $$ = new NInteger($1);  }
-	/*| IF exp THEN exp  { $$ = new NIf(*$2,*$4, NULL); }*/
-	| IF exp THEN exp ELSE exp { $$ = new NIf(*$2, *$4, *$6); }
-	
+    exp : term binop exp { $$ = new NBinaryOperator(*$1, $2, *$3); }
+        | term  { $$ = $1; }
+        ;
 
-    binop : PLUS { $$ = PLUS; }
-          | MINUS { $$ = MINUS; }
-	  | MUL { $$ = MUL; }
-	  | DIV { $$ = DIV; }
-	  ;
+    term : LPAREN exp RPAREN { $$ = $2; }
+        | NUMBER   { $$ = new NInteger($1); }
+        ;
+
+    binop : OPLE  { $$ = OPLE;  }
+        |   OPL   { $$ = OPL;   }
+        |   OPGE  { $$ = OPGE;  }
+        |   OPG   { $$ = OPG;   }
+        |   EQUAL { $$ = EQUAL; }
+        |   PLUS  { $$ = PLUS;  }
+        |   MINUS { $$ = MINUS; }
+        ;
 %%
