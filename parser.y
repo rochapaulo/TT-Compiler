@@ -28,14 +28,14 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
       Definição dos tipos dos símbolos não-terminais
 */
 %type <exp> exp;
-%type <exp> term;
-%type <token> binop;
+%type <exp> cmd;
+%type <token> op;
 /*    
       Precedência de operadores Matemáticos
 */
-%left OPLE OPL OPGE OPG EQUAL
 %left PLUS MINUS
 %left MUL DIV
+%nonassoc OPLE OPL OPGE OPG OPDIF
 
 %start program
 /*
@@ -45,20 +45,23 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
     program : exp { root = $1; }
             ;
 
-    exp : term binop exp { $$ = new NBinaryOperator(*$1, $2, *$3); }
-        | term  { $$ = $1; }
+    exp : cmd op exp { $$ = new NBinaryOperator(*$1, $2, *$3); }
+        | cmd  { $$ = $1; }
         ;
 
-    term : LPAREN exp RPAREN { $$ = $2; }
-        | NUMBER   { $$ = new NInteger($1); }
+    op : OPLE   { $$ = OPLE;  }
+        | OPL   { $$ = OPL;   }
+        | OPGE  { $$ = OPGE;  }
+        | OPG   { $$ = OPG;   }
+        | EQUAL { $$ = EQUAL; }
+        | PLUS  { $$ = PLUS;  }
+        | MINUS { $$ = MINUS; }
         ;
 
-    binop : OPLE  { $$ = OPLE;  }
-        |   OPL   { $$ = OPL;   }
-        |   OPGE  { $$ = OPGE;  }
-        |   OPG   { $$ = OPG;   }
-        |   EQUAL { $$ = EQUAL; }
-        |   PLUS  { $$ = PLUS;  }
-        |   MINUS { $$ = MINUS; }
+    cmd : LPAREN exp RPAREN { $$ = $2 }
+        | NUMBER { $$ = new NInteger($1); }
+        | IF exp THEN cmd { $$ = new NIf(*$2, *$4, *$4); }
+        | IF exp THEN cmd ELSE cmd { $$ = new NIf(*$2, *$4, *$6); }
+        | WHILE exp DO cmd { $$ = new NWhile(*$2, *$4); }
         ;
 %%
