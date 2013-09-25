@@ -1,6 +1,6 @@
 %{
 #include "Node.h"
-Node* root;
+Node* syntaxTree_root;
 extern int yylex();
 void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 %}
@@ -28,7 +28,12 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
       Definição dos tipos dos símbolos não-terminais
 */
 %type <exp> exp;
-%type <exp> cmd;
+%type <exp> term;
+%type <exp> integer_exp;
+%type <exp> binary_exp;
+%type <exp> if_exp;
+%type <exp> while_exp;
+
 %type <token> op;
 /*    
       Precedência de operadores Matemáticos
@@ -42,26 +47,50 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
       Regras da Gramática
 */
 %%
-    program : exp { root = $1; }
-            ;
+    program :
+	exp { syntaxTree_root = $1; }
+	;
 
-    exp : cmd op exp { $$ = new NBinaryOperator(*$1, $2, *$3); }
-        | cmd  { $$ = $1; }
-        ;
+    exp :
+	integer_exp
+	| binary_exp
+	| if_exp
+	| while_exp
+	;	
 
-    op : OPLE   { $$ = OPLE;  }
-        | OPL   { $$ = OPL;   }
-        | OPGE  { $$ = OPGE;  }
-        | OPG   { $$ = OPG;   }
-        | EQUAL { $$ = EQUAL; }
-        | PLUS  { $$ = PLUS;  }
-        | MINUS { $$ = MINUS; }
-        ;
+    integer_exp :
+	NUMBER { $$ = new NInteger($1); }
+	;
 
-    cmd : LPAREN exp RPAREN { $$ = $2 }
-        | NUMBER { $$ = new NInteger($1); }
-        | IF exp THEN cmd { $$ = new NIf(*$2, *$4, *$4); }
-        | IF exp THEN cmd ELSE cmd { $$ = new NIf(*$2, *$4, *$6); }
-        | WHILE exp DO cmd { $$ = new NWhile(*$2, *$4); }
-        ;
+    binary_exp :
+	term op exp  { $$ = new NBinaryOperator(*$1, $2, *$3); }
+	;
+
+    op :
+	PLUS    { $$ = PLUS;  }
+	| MINUS { $$ = MINUS; }
+	| MUL   { $$ = MUL;   }
+	| DIV   { $$ = DIV;   }
+	| OPG   { $$ = OPG;   }
+	| OPGE  { $$ = OPGE;  }
+	| OPL   { $$ = OPL;   }
+	| OPLE  { $$ = OPLE;  }
+	| OPDIF { $$ = OPDIF; }
+	| EQUAL { $$ = EQUAL; }
+	;
+
+    term :
+	LPAREN exp RPAREN { $$ = $2; }
+	| integer_exp
+	;
+
+    if_exp :
+	IF exp THEN exp { $$ = new NIf(*$2, *$4, *$4); }
+	| IF exp THEN exp ELSE exp { $$ = new NIf(*$2, *$4, *$6); }
+	;
+
+    while_exp :
+	WHILE exp DO exp { $$ = new NWhile(*$2, *$4); }
+	;
+
 %%
