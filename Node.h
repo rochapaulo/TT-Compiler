@@ -9,11 +9,15 @@ class NExpression;
 class NStatement;
 class NInteger;
 class NBinaryOperator;
+class NNegExp;
 class NWhile;
 class NIf;
+class NFor;
+class NBreak;
+class NReturn;
 
-typedef vector<NExpression*> ExpressionList;
-typedef vector<NStatement*> StatementList;
+typedef vector<NExpression*> NExpressionList;
+typedef vector<NStatement*> NStatementList;
 
 /* Todas as subclasses devem derivar de Node */
 class Node {
@@ -50,7 +54,13 @@ public:
     }
 };
 
+class NNegExp : public NExpression {
+private:
+    NExpression& exp;
 
+public:
+    NNegExp(NExpression& exp) : exp(exp) { }
+};
 
 class NWhile : public NExpression {
 private:
@@ -71,3 +81,25 @@ public:
     NIf(NExpression& condition, NExpression& bodyIf, NExpression& bodyElse) : condition(condition), bodyIf(bodyIf), bodyElse(bodyElse) { }
 };
 
+class NFor : public NExpression {
+private:
+    NExpression& initExp;
+    NExpression& endExp;
+    NExpression& body;
+
+public:
+    NFor(NExpression& initExp, NExpression& endExp, NExpression& body) : initExp(initExp), endExp(endExp), body(body) { }
+};
+
+class NBreak : public NExpression {
+public:
+    NBreak() { }
+};
+
+class NReturn : public NExpression {
+private:
+    NExpression& exp;
+
+public:
+    NReturn(NExpression& exp) : exp(exp) { }
+};

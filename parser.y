@@ -9,6 +9,8 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
     Node* node;
     NExpression* exp;
     NStatement* stm;
+    NExpressionList* expList;
+    NStatementList* stmList;
     int token;
     int t_number;
     string *t_string;
@@ -17,7 +19,7 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 /*     
       Definição dos símbolos não-terminais (tokens)
 */
-%token <token> IF THEN ELSE FOR TO DO WHILE BREAK PRINT
+%token <token> IF THEN ELSE FOR TO DO WHILE BREAK PRINT RETURN
 %token <token> PLUS MINUS MUL DIV EQUAL OPDIF OPGE OPLE OPG OPL AND OR
 %token <token> LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
 %token <t_string> IDENTIFIER STRING
@@ -31,8 +33,12 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 %type <exp> term;
 %type <exp> integer_exp;
 %type <exp> binary_exp;
+%type <exp> neg_exp;
+%type <exp> return_exp;
 %type <exp> if_exp;
 %type <exp> while_exp;
+%type <exp> for_exp;
+%type <exp> break_exp;
 
 %type <token> op;
 /*    
@@ -54,8 +60,12 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
     exp :
 	integer_exp
 	| binary_exp
+    | neg_exp
+    | return_exp
 	| if_exp
 	| while_exp
+    | for_exp
+    | break_exp
 	;	
 
     integer_exp :
@@ -63,7 +73,7 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 	;
 
     binary_exp :
-	term op exp  { $$ = new NBinaryOperator(*$1, $2, *$3); }
+	| term op exp  { $$ = new NBinaryOperator(*$1, $2, *$3); }
 	;
 
     op :
@@ -79,6 +89,14 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 	| EQUAL { $$ = EQUAL; }
 	;
 
+    neg_exp :
+    MINUS exp { $$ = new NNegExp(*$2) }
+    ;
+
+    return_exp :
+    RETURN exp { $$ = new NReturn(*$2) }
+    ;
+
     term :
 	LPAREN exp RPAREN { $$ = $2; }
 	| integer_exp
@@ -92,5 +110,13 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
     while_exp :
 	WHILE exp DO exp { $$ = new NWhile(*$2, *$4); }
 	;
+
+    for_exp :
+    FOR exp TO exp DO exp { $$ = new NFor(*$2, *$4, *$6); }
+    ;
+
+    break_exp :
+    BREAK { $$ = new NBreak(); }
+    ;
 
 %%

@@ -49,11 +49,11 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     ">"        	     return(OPG);
     "<"       	     return(OPL);
     "{"     	     return(LBRACE);
-    "}" 	     return(RBRACE);
-    "[" 	     return(LBRACKET);
+    "}" 	         return(RBRACE);
+    "[" 	         return(LBRACKET);
     "]"              return(RBRACKET);
-    "(" 	     return(LPAREN);
-    ")"  	     return(RPAREN);
+    "(" 	         return(LPAREN);
+    ")"  	         return(RPAREN);
     {IDENTIFIER}     { *(yylval.t_string) = yytext; return(IDENTIFIER); }
     ([+|-]?){DIGIT}+ { yylval.t_number = atoi(yytext); return(NUMBER); }
     {WHITESPACE}+   ;
