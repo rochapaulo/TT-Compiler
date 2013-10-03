@@ -103,3 +103,11 @@ private:
 public:
     NReturn(NExpression& exp) : exp(exp) { }
 };
+
+class NIdentifier : public NExpression {
+private:
+    string value;
+
+public:
+    NIdentifier(string value) : value(value) { }
+};
