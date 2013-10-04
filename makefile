@@ -7,6 +7,7 @@ all: $(EXEC) clean
 
 parser.cc: parser.y
 	$(BISON) -d -o parser.cpp parser.y
+	@mv parser.hpp parser.h
 
 lex.yy.cc: scanner.l
 	$(FLEX) scanner.l
@@ -15,8 +16,8 @@ parser: parser.cc lex.yy.cc
 	$(CC) -o parser parser.cpp lex.yy.c main.cpp -ll
 
 install: all
-	@mkdir build
+	@mkdir -p build
 	@mv $(EXEC) build
 
 clean:
-	rm *.c parser.h parser.cpp
+	rm *.c parser.cpp parser.h
