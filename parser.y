@@ -22,7 +22,7 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 %token <token> IF THEN ELSE FOR TO DO WHILE BREAK PRINT RETURN
 %token <token> PLUS MINUS MUL DIV EQUAL OPDIF OPGE OPLE OPG OPL AND OR
 %token <token> LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
-%token <t_string> IDENTIFIER STRING
+%token <t_string> IDENTIFIER STRING FUNCTION
 %token <t_number> NUMBER
 
 
@@ -39,6 +39,7 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 %type <exp> while_exp;
 %type <exp> for_exp;
 %type <exp> break_exp;
+%type <exp> lvalue;
 
 %type <token> op;
 /*    
@@ -66,6 +67,7 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 	| while_exp
     | for_exp
     | break_exp
+    | lvalue
 	;	
 
     integer_exp :
@@ -117,6 +119,10 @@ void yyerror(const char *error) { printf("ERROR: %s\n", error); }
 
     break_exp :
     BREAK { $$ = new NBreak(); }
+    ;
+
+    lvalue :
+    IDENTIFIER { $$ = new NSimpleVar(*$1); }
     ;
 
 %%

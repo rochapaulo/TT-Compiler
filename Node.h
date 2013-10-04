@@ -15,6 +15,8 @@ class NIf;
 class NFor;
 class NBreak;
 class NReturn;
+class NSimpleVar;
+
 
 typedef vector<NExpression*> NExpressionList;
 typedef vector<NStatement*> NStatementList;
@@ -29,8 +31,7 @@ public:
 };
 
 class NExpression : public Node { };
-
-class NStatement : public Node { };
+class NStatement : public NExpression { };
 
 class NInteger : public NExpression {
 private:
@@ -104,10 +105,10 @@ public:
     NReturn(NExpression& exp) : exp(exp) { }
 };
 
-class NIdentifier : public NExpression {
+class NSimpleVar : public NStatement {
 private:
     string value;
 
 public:
-    NIdentifier(string value) : value(value) { }
+    NSimpleVar(string value) : value(value) { }
 };

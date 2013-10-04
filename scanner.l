@@ -54,6 +54,7 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     "]"              return(RBRACKET);
     "(" 	         return(LPAREN);
     ")"  	         return(RPAREN);
+    "function"       return(FUNCTION);
     {IDENTIFIER}     { *(yylval.t_string) = yytext; return(IDENTIFIER); }
     ([+|-]?){DIGIT}+ { yylval.t_number = atoi(yytext); return(NUMBER); }
     {WHITESPACE}+   ;
