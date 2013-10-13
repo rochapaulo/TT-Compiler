@@ -54,6 +54,11 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     "]"              return(RBRACKET);
     "(" 	         return(LPAREN);
     ")"  	         return(RPAREN);
+    ":="             return(ASSIGN);
+    ";"              return(SEMICOLON);
+    ":"              return(COMMA);
+    "."              return(DOT);
+    ","              return(COLON);
     "function"       return(FUNCTION);
     "import"         return(IMPORT);
     {IDENTIFIER}     { *(yylval.t_string) = yytext; return(IDENTIFIER); }
