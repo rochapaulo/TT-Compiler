@@ -8,6 +8,7 @@ printf("ERROR: %s\n", error);
 %}
 
 %union {
+    Node                *program;
     string              *identfier;
     string              *str_value;
     int                 integer;
@@ -17,8 +18,8 @@ printf("ERROR: %s\n", error);
     NExpressionList     *exps;
     NStatementList      *decs;
     NFunctionDec        *fundec;
-    NField              *field
-    NFieldList          *field_list
+    NField              *field;
+    NFieldList          *field_list;
 }
 
 %token <identifier> IDENTIFIER
@@ -38,39 +39,47 @@ printf("ERROR: %s\n", error);
 %left PLUS MINUS
 %left MUL DIV
 
-%type <exp> program
+%type <program> program
 %type <exp> exp
-%type <exp> integer_exp
 %type <exp> binary_exp
+%type <exp> term
+%type <exp> neg_exp
 %type <exp> if_exp
 %type <exp> while_exp
 %type <exp> for_exp
+%type <exp> return_exp
 %type <exp> break_exp
-%type <exp> funcall_exp
+%type <exp> funcall
 %type <exp> array_creation
 %type <exp> register_creation
-%type <exps> exps
 %type <exps> args
-%type <var> lvalue
 %type <identifier> identifier
 
 %type <dec> dec
 %type <dec> vardec
 %type <dec> fundec
+%type <dec> import
 %type <decs> decs
 %type <decs> decseq
 
-%type <field> tyfield;
-%type <field_lust> tyfields;
+%type <field> tyfield
+%type <field_list> tyfields
+%type <field_list> tyfield_list
+
+%type <field> recfield
+%type <field_list> recfields
+%type <field_list> recfield_list
+
+%type <token> op
 %%
 program
     : exp
     {
-        $$ = new AST_Program(@1.first_line, @1.first_column, $1);
+        $$ = new AST_Program($1);
     }
-    | decs 
+    | decs
     {
-        $$ = new AST_Program(@1.first_line, @1.first_column, $1);
+        $$ = new AST_Program($1);
     }
     ;
 
@@ -130,7 +139,7 @@ term
     {
         $$ = $2;
     }
-    | integer_exp
+    | NUMBER
     {
         $$ = $1;
     }
@@ -179,6 +188,13 @@ op
     }
     ;
 
+neg_exp
+    : MINUS exp
+    {
+        $$ = new NNegation($2);
+    }
+    ;
+
 if_exp 
     : IF exp THEN exp
     {
@@ -201,6 +217,13 @@ for_exp
     : FOR identifier ASSIGN exp TO exp DO exp
     {
         $$ = new NFor($2, $4, $6, $8);
+    }
+    ;
+
+return_exp
+    : RETURN
+    {
+        $$ = new NReturn();
     }
     ;
 
@@ -251,7 +274,7 @@ recfield_list
     ;
 
 recfield 
-    : identifier EQ exp
+    : identifier EQUAL exp
     {
         $$ = new NField($1, $3);
     }
@@ -362,17 +385,17 @@ tyfield_list
         field_list->push_back($1);
         $$ = fieldList;
     }
-    | tyfields_list COMMA tyfield
+    | tyfield_list COLON tyfield
     {
         $1->push_back($3);
         $$ = $1;
     }
     ;
 
-tyfield 
-    : identifier COLON identifier
+tyfield
+    : identifier
     {
-        $$ = new NField($1, $3);
+        $$ = new NField($1);
     }
     ;
 
