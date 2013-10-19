@@ -1,195 +1,208 @@
-#include <string>
 #include <vector>
-
+#include <stdio>
 using namespace std;
 
-/* --------------- classes -------------- */
-class Node;
-class AST_Program;
 
-class NExpression;
-class NBinaryOperation;
-class NIf;
-class NWhile;
-class NFor;
-class NBreak;
-class NArray;
-class NRecord;
-class NFunctionCall;
-class NSimpleVar;
-
-class NStatement;
-class NFunctionDec;
-class NImport;
-class NField;
-/* -------------------------------------- */
-
-typedef vector<NStatement*> NStatementList;
-typedef vector<NExpression*> NExpressionList;
-typedef vector<NField*> NFieldList;
-
-
-class Node 
+class Node
 {
-    int line;
-    int column;
+    private:
+        int lin;
+        int col;
+
+    public:
+        void set_line(int lin)
+        {
+            this->lin = lin;
+        }
+        
+        void set_column(int col)
+        {
+            this->col = col;
+        }
 };
 
-class AST_Program : public Node 
+class AST_Program : public Node
 {
-    Node node;
+    private:
+        vector <Node*> nodeList;
 
-    public: 
-        AST_Program(int line, int column, Node node) :
-        line(line),
-        column(column),
-        node(node) { }
+    public:
+        AST_Program(vector<Node*> nodeList)
+        {
+            this->nodeList = nodeList;
+        }
 };
 
-class NExpression : public Node {};
-class NStatement  : public Node {};
+class NExpression : public Node
+{
+};
+
+class NStatement : public Node
+{
+};
 
 class NBinaryOperation : public NExpression
 {
-    NExpression l_exp;
-    NExpression r_exp;
-    int op;
+    private:
+        NExpression rExp;
+        NExpression lExp;
+        int op;
 
     public:
-        NBinaryOperation(NExpression l_exp, int op, NExpression r_exp) : 
-        l_exp(l_exp),
-        op(op),
-        r_exp(r_exp) { }
+        NBinaryOperation(NExpression rExp, NExpression lExp, int op)
+        {
+            this->rExp = rExp;
+            this->lExp = lExp;
+            this->op = op;
+        }
 };
 
-class NIf : public NExpression 
+class NNegation : public NExpression
 {
-    NExpression condition;
-    NExpression exp_1;
-    NExpression exp_2;
-    
+    private:
+        NExpression exp;
+
     public:
-        NIf(NExpression condition, NExpression exp_1, NExpression exp_2) :
-        condition(condition),
-        exp_1(exp_1),
-        exp_2(exp_2) { }
+        NNegation(NExpression exp)
+        {
+            this->exp = exp;
+        }
+};
+
+class NReturn : public NExpression
+{
+    private:
+        NExpression exp;
+
+    public:
+        NReturn(NExpression exp)
+        {
+            this->exp = exp;
+        }
+};
+
+class NIdentifier : public NExpression
+{
+    private:
+        string identifier;
+
+    public:
+        NIdentifier(string identifier)
+        {
+            this->identifier = identifier;
+        }
+};
+
+class NAssign : public NExpression
+{
+    private:
+        NIdentifier identifier;
+        NExpression exp;
+
+    public:
+        NAssign(NIdentifier identifier, NExpression exp)
+        {
+            this->identifier = identifier;
+            this->exp = exp;
+        }
+};
+
+class NIf : public NExpression
+{
+    private:
+        NExpression cond;
+        NExpression trueExp;
+        NExpression falseExp;
+
+    public:
+        NIf(NExpression cond, NExpression trueExp, NExpression falseExp)
+        {
+            this->cond = cond;
+            this->trueExp = trueExp;
+            this->falseExp = falseExp;
+        }
 };
 
 class NWhile : public NExpression
 {
-    NExpression condition;
-    NExpression body;
+    private:
+        NExpression cond;
+        NExpression body;
 
     public:
-        NWhile(NExpression condition, NExpression body) :
-        condition(condition),
-        body(body) { }
+        NWhile(NExpression cond, NExpression body)
+        {
+            this->cond = cond;
+            this->body = body;
+        }
 };
 
 class NFor : public NExpression
 {
-    string identifier;
-    NExpression init_exp;
-    NExpression to_exp;
-    NExpression do_exp;
+    private:
+        string idVar;
+        NExpression initExp;
+        NExpression endExp;
+        NExpression body;        
 
     public:
-        NFor(string identifier, NExpression init_exp, NExpression to_exp, NExpression do_exp) :
-        identifier(identifier),
-        init_exp(init_exp),
-        to_exp(to_exp),
-        do_exp(do_exp) { }
+        NFor(string idVar, NExpression initExp, NExpression endExp, NExpression body)
+        {
+            this->idVar = idVar;
+            this->initExp = initExp;
+            this->endExp = endExp;
+            this->body = body;
+        }
 };
 
-class NBreak : public NExpression 
+class NBreak : public NExpression
 {
     public:
-        NBreak() { }
+        NBreak()
+        {
+        }
 };
 
-class NArray : public NArray 
+class NArrayCreation : public NExpression
 {
-    string identifier;
-    NExpressionList elements;
+    private:
+        NIdentifier identifier;
+        int dimension;
 
     public:
-        NArray(string identifier, NExpressionList elements) :
-        identifier(identifier),
-        elements(elements) { }
+        NArrayCreation(NIdentifier identifier, int dimension)
+        {
+            this->identifier = identifier;
+            this->dimension = dimension;
+        }
 };
 
-class NRecord : public NExpression 
+class NArrayAccess : public NExpression
 {
-    string identifier;
-    NExpressionList elements;
-   
+    private:
+        NIdentifier identifier;
+        vector <NExpression*> indexList;
+        
     public:
-        NRecord(string identifier, NExpressionList elements) :
-        identifier(identifier),
-        elements(elements) { }
+        NArrayAccess(NIdentifier identifier, vector <NExpression*> indexList)
+        {
+            this->identifier = identifier;
+            this->indexList = indexList;
+        }
 };
 
-class NField() : public NExpression 
+class NFunCall : public NExpression
 {
-    string identifier;
-    NExpression exp;
+    private:
+        NIdentifier identifier;
+        vector <NExpression*> args;
 
     public:
-        NField(string identifier, NExpression exp) :
-        identifier(identifier),
-        exp(exp) { }
+        NFunCall(NIdentifier identifier, vector<NExpression*> args)
+        {
+            this->identifier = identifier;
+            this->args = args;
+        }
 };
 
-class NFunctionCall : public NExpression 
-{
-    string identifier;
-    NExpressionList args;
-    
-    public:
-        NFunctionCall(string identifier, NExpressionList args) :
-        identifier(identifier),
-        args(args) { }
-};
 
-class NSimpleVar : public NStatement 
-{
-    string identifier;
-    NExpression exp;
-
-    public:
-        NSimpleVar(string identifier, NExpression exp) :
-        identifier(identifier),
-        exp(exp) { }
-};
-
-class NFunctionDec : public NStatement
-{
-    string identifier;
-    NFIeldList tyfields;
-    NExpression body;
-
-    public:
-        NFunctionDec(string identifier, NFieldList tyfields, NExpression body) :
-        identifier(identifier),
-        tyfields(tyfields),
-        body(body) { }
-};
-
-class NImport : public NStatement
-{
-    string identifier;
-
-    public:
-        NImport(string identifier) :
-        identifier(identifier) { }
-};
-
-class NField {
-    string identifier_1;
-    string identifier_2;
-
-    public:
-        NField(string identifier_1, string identifier_2) :
-        identifier_1(identifier_1),
-        identifier_2(identifier_2) { }
-};
