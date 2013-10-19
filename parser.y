@@ -51,12 +51,15 @@ printf("ERROR: %s\n", error);
 %type <exp> break_exp
 %type <exp> funcall
 %type <exp> array_creation
-%type <exp> register_creation
+%type <exp> lvalue
+%type <exp> assign
+%type <exp> dimensions
+%type <exp> dimension_acc
+%type <exps> exps
 %type <exps> args
 %type <identifier> identifier
 
 %type <dec> dec
-%type <dec> vardec
 %type <dec> fundec
 %type <dec> import
 %type <decs> decs
@@ -66,22 +69,39 @@ printf("ERROR: %s\n", error);
 %type <field_list> tyfields
 %type <field_list> tyfield_list
 
-%type <field> recfield
-%type <field_list> recfields
-%type <field_list> recfield_list
-
-%type <token> op
 %%
 program
-    : exp
-    {
-        $$ = new AST_Program($1);
-    }
-    | decs
+    : sub_program
     {
         $$ = new AST_Program($1);
     }
     ;
+
+sub_program
+    : exp
+    {
+        vector<Nove *> *nodeList;
+	nodeList->push_back($1);
+	$$ = nodeList;
+    }
+    | dec
+    {
+        vector<Nove *> *nodeList;
+	nodeList->push_back($1);
+	$$ = nodeList;
+    }
+    | exp sub_program
+    {
+        $2->push_back($1);
+	$$ = $2;
+    }
+    | dec sub_program
+    {
+        $2->push_back($1);
+	$$ = $2;
+    }
+    ;
+
 
 exp
     : binary_exp
@@ -93,6 +113,14 @@ exp
         $$ = $1;
     }
     | return_exp
+    {
+        $$ = $1;
+    }
+    | assign
+    {
+        $$ = $1;
+    }
+    | lvalue
     {
         $$ = $1;
     }
@@ -116,10 +144,6 @@ exp
     {
         $$ = $1;
     }
-    | register_creation
-    {
-        $$ = $1;
-    }
     | funcall
     {
         $$ = $1;
@@ -128,21 +152,22 @@ exp
 
 
 binary_exp
-    : term op exp
+    : term op term
     {
         $$ = new NBinaryOperation($1, $2, $3);
     }
     ;
 
 term 
-    : LPAREN exp RPAREN
+    : exp
     {
-        $$ = $2;
+        $$ = $1;
     }
     | NUMBER
     {
         $$ = $1;
     }
+    | LPAREN exps RPAREN
     ;
 
 op 
@@ -195,6 +220,37 @@ neg_exp
     }
     ;
 
+assign 
+    :   lvalue ASSIGN exp
+    {
+        $$ = new NAssign($1, $3);
+    }
+    ;
+
+lvalue
+    : identifier 
+    {
+        $$ = new NIdentifier($1);
+    }
+    | identifier dimension_acc
+    {
+        $$ = new NArrayAccess($1, $2);
+    }
+    ;
+
+dimension_acc
+    :  LBRACKET exp RBRACKET
+    {
+        vector<NExpression*> *expList;
+	expList->push_back($2);
+	$$ = expList;
+    }
+    |  LBRACKET exp BRACKET dimension_acc
+    {
+        $4->push_back($2);
+	$$ = $4;
+    }
+
 if_exp 
     : IF exp THEN exp
     {
@@ -221,9 +277,9 @@ for_exp
     ;
 
 return_exp
-    : RETURN
+    : RETURN exp
     {
-        $$ = new NReturn();
+        $$ = new NReturn($2);
     }
     ;
 
@@ -235,50 +291,22 @@ break_exp
     ;
 
 array_creation 
-    : identifier LBRACKET exp RBRACKET
+    : identifier dimensions
     {
-        $$ = new NArray($1, $3);
+        $$ = new NArray($1, $2);
     }
     ;
 
-register_creation
-    : identifier LBRACE recfields RBRACE
+dimensions
+    : LBRACKET RBRACKT
     {
-        $$ = new NRecord($1, $3);
+        int i = 1;
+	$$ = i;
     }
-    ;
-
-recfields 
-    : /* Empty */
+    | LBRACKET RBRACKET COLON dimensions
     {
-        $$ = NULL;
+       $$ = $4 + 1; 
     }
-    | recfield_list
-    {
-        $$ = $1;
-    }
-    ;
-
-recfield_list
-    : recfield
-    {
-        NExpressionList *recList;
-        recList->push_back($1);
-        $$ = recList;
-    }
-    | recfield_list COMMA recfield
-    {
-        $1->push_back($3);
-        $$ = $1;
-    }
-    ;
-
-recfield 
-    : identifier EQUAL exp
-    {
-        $$ = new NField($1, $3);
-    }
-    ;
 
 funcall 
     : identifier LPAREN RPAREN
@@ -291,14 +319,28 @@ funcall
     }
     ;
 
+exps
+    : exp
+    {
+	vector<NExpression*> *expList;
+	expList->push_back($1);
+	$$ = expList;
+    }
+    | exps SEMICOLON exp
+    {
+        $1->push_back($3);
+	$$ = $1;
+    }
+    ;
+
 args 
     : exp
     {
-        NExpressionList *expList;
+        vector<NExpression*> *expList;
         expList->push_back($1);
         $$ = expList;
     }
-    | args COMMA exp
+    | args COLON exp
     {
         $1->push_back($3);
         $$ = $1;
@@ -331,24 +373,13 @@ decseq
     ;
 
 dec 
-    : vardec
-    {
-        $$ = $1;
-    }
-    | fundec
+    : fundec
     {
         $$ = $1;
     }
     | import
     {
         $$ = $1;
-    }
-    ;
-
-vardec 
-    :   identifier ASSIGN exp
-    {
-        $$ = new NSimpleVar($1, $3);
     }
     ;
 
@@ -381,7 +412,7 @@ tyfields
 tyfield_list 
     : tyfield
     {
-        NFieldList *fieldList;
+        vector<NIdentifier*> *fieldList;
         field_list->push_back($1);
         $$ = fieldList;
     }
@@ -395,7 +426,7 @@ tyfield_list
 tyfield
     : identifier
     {
-        $$ = new NField($1);
+        $$ = new NIdentifier($1);
     }
     ;
 
