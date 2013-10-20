@@ -24,12 +24,14 @@ class Node
 class AST_Program : public Node
 {
     private:
-        vector <Node*> nodeList;
+        vector <NStatement*> stmList;
+        NExpression exp;
 
     public:
-        AST_Program(vector<Node*> nodeList)
+        AST_Program(vector<NStatement*> stmList, NExpression exp)
         {
-            this->nodeList = nodeList;
+            this->stmList = stmList;
+            this->exp = exp;
         }
 };
 
