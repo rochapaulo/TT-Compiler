@@ -9,18 +9,18 @@ printf("ERROR: %s\n", error);
 %}
 
 %union {
-    Node                *program;
-    string              *identfier;
-    string              *str_value;
-    int                 integer;
-    NExpression         *exp;
-    NStatement          *dec;
-    NSimpleVar          *var;
-    NExpressionList     *exps;
-    NStatementList      *decs;
-    NFunctionDec        *fundec;
-    NField              *field;
-    NFieldList          *field_list;
+    Node 	               	*program;
+    string      	       	*identfier;
+    string             		*str_value;
+    int                 	integer;
+    int				op;
+    NExpression         	*exp;
+    NStatement          	*dec;
+    vector<NExpression*>	*exps;
+    vector<NStatement*>      	*decs;
+    NFunctionDec        	*fundec;
+    NField              	*field;
+    NFieldList          	*field_list;
 }
 
 %token <identifier> IDENTIFIER
@@ -60,6 +60,8 @@ printf("ERROR: %s\n", error);
 %type <exps> args
 %type <identifier> identifier
 
+%type <op>op
+
 %type <dec> dec
 %type <dec> fundec
 %type <dec> import
@@ -72,37 +74,11 @@ printf("ERROR: %s\n", error);
 
 %%
 program
-    : sub_program
+    : decs exp
     {
-        $$ = new AST_Program($1);
+        $$ = new AST_Program($1, $2);
     }
     ;
-
-sub_program
-    : exp
-    {
-        vector<Nove *> *nodeList;
-	nodeList->push_back($1);
-	$$ = nodeList;
-    }
-    | dec
-    {
-        vector<Nove *> *nodeList;
-	nodeList->push_back($1);
-	$$ = nodeList;
-    }
-    | exp sub_program
-    {
-        $2->push_back($1);
-	$$ = $2;
-    }
-    | dec sub_program
-    {
-        $2->push_back($1);
-	$$ = $2;
-    }
-    ;
-
 
 exp
     : binary_exp
@@ -169,6 +145,9 @@ term
         $$ = $1;
     }
     | LPAREN exps RPAREN
+    {
+        $$ = $2;
+    }
     ;
 
 op 
@@ -246,7 +225,7 @@ dimension_acc
 	expList->push_back($2);
 	$$ = expList;
     }
-    |  LBRACKET exp BRACKET dimension_acc
+    |  LBRACKET exp RBRACKET dimension_acc
     {
         $4->push_back($2);
 	$$ = $4;
@@ -299,7 +278,7 @@ array_creation
     ;
 
 dimensions
-    : LBRACKET RBRACKT
+    : LBRACKET RBRACKET
     {
         int i = 1;
 	$$ = i;
@@ -362,7 +341,7 @@ decs
 decseq
     : dec
     {
-        NStatementList * stmList;
+        vector<NStatement*> * stmList;
         stmList->push_back($1);
         $$ = stmList;
     }

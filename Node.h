@@ -1,5 +1,6 @@
 #include <vector>
-#include <stdio>
+#include <string>
+
 using namespace std;
 
 
@@ -21,6 +22,14 @@ class Node
         }
 };
 
+class NExpression : public Node
+{
+};
+
+class NStatement : public Node
+{
+};
+
 class AST_Program : public Node
 {
     private:
@@ -33,14 +42,6 @@ class AST_Program : public Node
             this->stmList = stmList;
             this->exp = exp;
         }
-};
-
-class NExpression : public Node
-{
-};
-
-class NStatement : public Node
-{
 };
 
 class NBinaryOperation : public NExpression
@@ -102,9 +103,8 @@ class NAssign : public NExpression
         NExpression exp;
 
     public:
-        NAssign(NIdentifier identifier, NExpression exp)
+        NAssign(NIdentifier identifier, NExpression exp) : identifier(identifier)
         {
-            this->identifier = identifier;
             this->exp = exp;
         }
 };
@@ -172,9 +172,8 @@ class NArrayCreation : public NExpression
         int dimension;
 
     public:
-        NArrayCreation(NIdentifier identifier, int dimension)
+        NArrayCreation(NIdentifier identifier, int dimension) : identifier(identifier)
         {
-            this->identifier = identifier;
             this->dimension = dimension;
         }
 };
@@ -186,9 +185,8 @@ class NArrayAccess : public NExpression
         vector <NExpression*> indexList;
         
     public:
-        NArrayAccess(NIdentifier identifier, vector <NExpression*> indexList)
+        NArrayAccess(NIdentifier identifier, vector <NExpression*> indexList) : identifier(identifier)
         {
-            this->identifier = identifier;
             this->indexList = indexList;
         }
 };
@@ -200,7 +198,7 @@ class NFunCall : public NExpression
         vector <NExpression*> args;
 
     public:
-        NFunCall(NIdentifier identifier, vector<NExpression*> args)
+        NFunCall(NIdentifier identifier, vector<NExpression*> args) : identifier(identifier)
         {
             this->identifier = identifier;
             this->args = args;
