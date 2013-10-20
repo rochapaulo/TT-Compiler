@@ -13,14 +13,12 @@ printf("ERROR: %s\n", error);
     string      	       	*identfier;
     string             		*str_value;
     int                 	integer;
-    int				op;
+    int		        		op;
     NExpression         	*exp;
     NStatement          	*dec;
     vector<NExpression*>	*exps;
-    vector<NStatement*>      	*decs;
+    vector<NStatement*>     *decs;
     NFunctionDec        	*fundec;
-    NField              	*field;
-    NFieldList          	*field_list;
 }
 
 %token <identifier> IDENTIFIER
@@ -124,6 +122,10 @@ exp
     | funcall
     {
         $$ = $1;
+    } 
+    | LPAREN exps RPAREN
+    {
+        $$ = new NExpressionList($2);
     }
     ;
 
@@ -142,11 +144,7 @@ term
     }
     | NUMBER
     {
-        $$ = $1;
-    }
-    | LPAREN exps RPAREN
-    {
-        $$ = $2;
+        $$ = new NInteger($1);
     }
     ;
 
@@ -201,7 +199,7 @@ neg_exp
     ;
 
 assign 
-    :   lvalue ASSIGN exp
+    :  lvalue ASSIGN exp
     {
         $$ = new NAssign($1, $3);
     }
@@ -210,11 +208,11 @@ assign
 lvalue
     : identifier 
     {
-        $$ = new NIdentifier($1);
+          $$ = new NLValue($1, NULL);
     }
     | identifier dimension_acc
     {
-        $$ = new NArrayAccess($1, $2);
+          $$ = new NLValue($1, $2);
     }
     ;
 
@@ -222,13 +220,13 @@ dimension_acc
     :  LBRACKET exp RBRACKET
     {
         vector<NExpression*> *expList;
-	expList->push_back($2);
-	$$ = expList;
+    	expList->push_back($2);
+	    $$ = expList;
     }
     |  LBRACKET exp RBRACKET dimension_acc
     {
         $4->push_back($2);
-	$$ = $4;
+    	$$ = $4;
     }
 
 if_exp 
@@ -302,14 +300,14 @@ funcall
 exps
     : exp
     {
-	vector<NExpression*> *expList;
-	expList->push_back($1);
-	$$ = expList;
+    	vector<NExpression*> *expList;
+	    expList->push_back($1);
+    	$$ = expList;
     }
     | exps SEMICOLON exp
     {
         $1->push_back($3);
-	$$ = $1;
+        $$ = $1;
     }
     ;
 

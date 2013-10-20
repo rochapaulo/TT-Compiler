@@ -3,6 +3,24 @@
 
 using namespace std;
 
+class NExpression;
+class NStatement;
+class AST_Program;
+class NBinaryOperation;
+class NNegation;
+class NReturn;
+class NIdentifier;
+class NAssign;
+class NIf;
+class NWhile;
+class NFor;
+class NBreak;
+class NLValue;
+class NArrayCreation;
+class NFunCall;
+class NInteger;
+class NFunctionDec;
+class NImport;
 
 class Node
 {
@@ -33,11 +51,11 @@ class NStatement : public Node
 class AST_Program : public Node
 {
     private:
-        vector <NStatement*> stmList;
-        NExpression exp;
+        vector <NStatement*> *stmList;
+        NExpression *exp;
 
     public:
-        AST_Program(vector<NStatement*> stmList, NExpression exp)
+        AST_Program(vector<NStatement*> *stmList, NExpression *exp)
         {
             this->stmList = stmList;
             this->exp = exp;
@@ -47,12 +65,12 @@ class AST_Program : public Node
 class NBinaryOperation : public NExpression
 {
     private:
-        NExpression rExp;
-        NExpression lExp;
+        NExpression *rExp;
+        NExpression *lExp;
         int op;
 
     public:
-        NBinaryOperation(NExpression rExp, NExpression lExp, int op)
+        NBinaryOperation(NExpression *rExp, int op, NExpression *lExp)
         {
             this->rExp = rExp;
             this->lExp = lExp;
@@ -60,13 +78,25 @@ class NBinaryOperation : public NExpression
         }
 };
 
+class NInteger : public NExpression
+{
+    private:
+        int value;
+    
+    public:
+        NInteger(int value)
+        {
+            this->value = value;
+        }
+};
+
 class NNegation : public NExpression
 {
     private:
-        NExpression exp;
+        NExpression *exp;
 
     public:
-        NNegation(NExpression exp)
+        NNegation(NExpression *exp)
         {
             this->exp = exp;
         }
@@ -75,10 +105,10 @@ class NNegation : public NExpression
 class NReturn : public NExpression
 {
     private:
-        NExpression exp;
+        NExpression *exp;
 
     public:
-        NReturn(NExpression exp)
+        NReturn(NExpression *exp)
         {
             this->exp = exp;
         }
@@ -96,15 +126,29 @@ class NIdentifier : public NExpression
         }
 };
 
-class NAssign : public NExpression
+class NLValue : public NExpression
 {
     private:
         NIdentifier identifier;
-        NExpression exp;
+        vector <NExpression*> *indexList;
+        
+    public:
+        NLValue(NIdentifier identifier, vector <NExpression*> *indexList) : identifier(identifier)
+        {
+            this->indexList = indexList;
+        }
+};
+
+class NAssign : public NExpression
+{
+    private:
+        NLValue *lvalue;
+        NExpression *exp;
 
     public:
-        NAssign(NIdentifier identifier, NExpression exp) : identifier(identifier)
+        NAssign(NLValue *lvalue, NExpression *exp)
         {
+            this->lvalue = lvalue;
             this->exp = exp;
         }
 };
@@ -112,12 +156,12 @@ class NAssign : public NExpression
 class NIf : public NExpression
 {
     private:
-        NExpression cond;
-        NExpression trueExp;
-        NExpression falseExp;
+        NExpression *cond;
+        NExpression *trueExp;
+        NExpression *falseExp;
 
     public:
-        NIf(NExpression cond, NExpression trueExp, NExpression falseExp)
+        NIf(NExpression *cond, NExpression *trueExp, NExpression *falseExp)
         {
             this->cond = cond;
             this->trueExp = trueExp;
@@ -128,11 +172,11 @@ class NIf : public NExpression
 class NWhile : public NExpression
 {
     private:
-        NExpression cond;
-        NExpression body;
+        NExpression *cond;
+        NExpression *body;
 
     public:
-        NWhile(NExpression cond, NExpression body)
+        NWhile(NExpression *cond, NExpression *body)
         {
             this->cond = cond;
             this->body = body;
@@ -143,12 +187,12 @@ class NFor : public NExpression
 {
     private:
         string idVar;
-        NExpression initExp;
-        NExpression endExp;
-        NExpression body;        
+        NExpression *initExp;
+        NExpression *endExp;
+        NExpression *body;        
 
     public:
-        NFor(string idVar, NExpression initExp, NExpression endExp, NExpression body)
+        NFor(string idVar, NExpression *initExp, NExpression *endExp, NExpression *body)
         {
             this->idVar = idVar;
             this->initExp = initExp;
@@ -178,31 +222,60 @@ class NArrayCreation : public NExpression
         }
 };
 
-class NArrayAccess : public NExpression
-{
-    private:
-        NIdentifier identifier;
-        vector <NExpression*> indexList;
-        
-    public:
-        NArrayAccess(NIdentifier identifier, vector <NExpression*> indexList) : identifier(identifier)
-        {
-            this->indexList = indexList;
-        }
-};
 
 class NFunCall : public NExpression
 {
     private:
         NIdentifier identifier;
-        vector <NExpression*> args;
+        vector <NExpression*> *args;
 
     public:
-        NFunCall(NIdentifier identifier, vector<NExpression*> args) : identifier(identifier)
+        NFunCall(NIdentifier identifier, vector<NExpression*> *args) : identifier(identifier)
         {
             this->identifier = identifier;
             this->args = args;
         }
 };
 
+class NExpressionList : public NExpression
+{
+    private:
+        vector<NExpression*> *expList;
 
+    public:
+        NExpressionList(vector<NExpression*> *expList)
+        {
+            this->expList = expList;
+        }
+};
+
+
+/*
+    DECLARATIONS
+*/
+
+class NFunctionDec : public NStatement
+{
+    private:
+        NIdentifier identifier;
+        vector<NIdentifier*> *args;
+        NExpression *exp;
+
+    public:
+        NFunctionDec(NIdentifier identifier, vector<NIdentifier*> *args, NExpression *exp) : identifier(identifier)
+        {
+            this->args = args;
+            this->exp = exp;
+        }
+};
+
+class NImport : public NStatement
+{
+    private:
+        NIdentifier identifier;
+
+    public:
+        NImport(NIdentifier identifier) : identifier(identifier)
+        {
+        }
+};
