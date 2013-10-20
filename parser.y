@@ -10,22 +10,25 @@ printf("ERROR: %s\n", error);
 
 %union {
     Node 	               	*program;
-    string      	       	*identfier;
     string             		*str_value;
+    string                  *str_identifier;
     int                 	integer;
     int		        		op;
     NExpression         	*exp;
     NStatement          	*dec;
+    NIdentifier             *identifier;
+    NLValue                 *leftValue;
     vector<NExpression*>	*exps;
     vector<NStatement*>     *decs;
+    vector<NIdentifier*>    *tyfields;
     NFunctionDec        	*fundec;
 }
 
-%token <identifier> IDENTIFIER
 %token <integer> NUMBER
 %token <str_value> STRING
 
-%token  IF THEN ELSE FOR TO DO WHILE BREAK PRINT RETURN IMPORT FUNCTION
+%token IDENTIFIER
+%token IF THEN ELSE FOR TO DO WHILE BREAK PRINT RETURN IMPORT FUNCTION
 %token PLUS MINUS MUL DIV EQUAL OPDIF OPGE OPLE OPG OPL AND OR ASSIGN
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON
 %token COMMA DOT COLON
@@ -50,13 +53,10 @@ printf("ERROR: %s\n", error);
 %type <exp> break_exp
 %type <exp> funcall
 %type <exp> array_creation
-%type <exp> lvalue
 %type <exp> assign
-%type <exp> dimensions
-%type <exp> dimension_acc
 %type <exps> exps
+%type <exps> dimension_acc
 %type <exps> args
-%type <identifier> identifier
 
 %type <op>op
 
@@ -66,9 +66,10 @@ printf("ERROR: %s\n", error);
 %type <decs> decs
 %type <decs> decseq
 
-%type <field> tyfield
-%type <field_list> tyfields
-%type <field_list> tyfield_list
+%type <tyfields> tyfields
+%type <leftValue> leftValue
+%type <identifier> identifier
+%type <int> dimensions
 
 %%
 program
@@ -92,10 +93,6 @@ exp
         $$ = $1;
     }
     | assign
-    {
-        $$ = $1;
-    }
-    | lvalue
     {
         $$ = $1;
     }
@@ -144,7 +141,7 @@ term
     }
     | NUMBER
     {
-        $$ = new NInteger($1);
+        $$ = new NInteger(yylval.integer);
     }
     ;
 
@@ -199,13 +196,13 @@ neg_exp
     ;
 
 assign 
-    :  lvalue ASSIGN exp
+    :  leftValue ASSIGN exp
     {
         $$ = new NAssign($1, $3);
     }
     ;
 
-lvalue
+leftValue
     : identifier 
     {
           $$ = new NLValue($1, NULL);
@@ -271,7 +268,7 @@ break_exp
 array_creation 
     : identifier dimensions
     {
-        $$ = new NArray($1, $2);
+        $$ = new NArrayCreation($1, $2);
     }
     ;
 
@@ -279,12 +276,13 @@ dimensions
     : LBRACKET RBRACKET
     {
         int i = 1;
-	$$ = i;
+        $$ = i;
     }
     | LBRACKET RBRACKET COLON dimensions
     {
        $$ = $4 + 1; 
     }
+    ;
 
 funcall 
     : identifier LPAREN RPAREN
@@ -364,7 +362,7 @@ dec
 fundec 
     : FUNCTION identifier LPAREN tyfields RPAREN EQUAL exp
     {
-        $$ = new NFunctionDec($2, $4, %7);
+        $$ = new NFunctionDec($2, $4, $7);
     }
     ;
 
@@ -376,42 +374,29 @@ import
     }
     ;
 
-tyfields 
+tyfields
     : /* Empty */
     {
-        $$ = NULL;
+        vector<NIdentifier*> *identifierList;
+        $$ = identifierList;
     }
-    | tyfield_list
-    {
-        $$ = $1;
-    }
-    ;
-
-tyfield_list 
-    : tyfield
+    | identifier
     {
         vector<NIdentifier*> *fieldList;
-        field_list->push_back($1);
+        fieldList->push_back($1);
         $$ = fieldList;
     }
-    | tyfield_list COLON tyfield
+    | tyfields COLON identifier
     {
         $1->push_back($3);
         $$ = $1;
     }
     ;
 
-tyfield
-    : identifier
-    {
-        $$ = new NIdentifier($1);
-    }
-    ;
-
 identifier 
     : IDENTIFIER
     {
-        $$ = $1;
+        $$ = new NIdentifier(yylval.str_identifier);
     }
     ;
 

@@ -117,10 +117,10 @@ class NReturn : public NExpression
 class NIdentifier : public NExpression
 {
     private:
-        string identifier;
+        string *identifier;
 
     public:
-        NIdentifier(string identifier)
+        NIdentifier(string *identifier)
         {
             this->identifier = identifier;
         }
@@ -129,12 +129,13 @@ class NIdentifier : public NExpression
 class NLValue : public NExpression
 {
     private:
-        NIdentifier identifier;
+        NIdentifier *identifier;
         vector <NExpression*> *indexList;
         
     public:
-        NLValue(NIdentifier identifier, vector <NExpression*> *indexList) : identifier(identifier)
+        NLValue(NIdentifier *identifier, vector <NExpression*> *indexList)
         {
+            this->identifier = identifier; 
             this->indexList = indexList;
         }
 };
@@ -186,15 +187,15 @@ class NWhile : public NExpression
 class NFor : public NExpression
 {
     private:
-        string idVar;
+        NIdentifier *identifier;
         NExpression *initExp;
         NExpression *endExp;
         NExpression *body;        
 
     public:
-        NFor(string idVar, NExpression *initExp, NExpression *endExp, NExpression *body)
+        NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body)
         {
-            this->idVar = idVar;
+            this->identifier = identifier;
             this->initExp = initExp;
             this->endExp = endExp;
             this->body = body;
@@ -212,25 +213,26 @@ class NBreak : public NExpression
 class NArrayCreation : public NExpression
 {
     private:
-        NIdentifier identifier;
+        NIdentifier *identifier;
         int dimension;
 
     public:
-        NArrayCreation(NIdentifier identifier, int dimension) : identifier(identifier)
+        NArrayCreation(NIdentifier *identifier, int dimension)
         {
+            this->identifier = identifier;
             this->dimension = dimension;
         }
 };
 
 
-class NFunCall : public NExpression
+class NFunctionCall : public NExpression
 {
     private:
-        NIdentifier identifier;
+        NIdentifier *identifier;
         vector <NExpression*> *args;
 
     public:
-        NFunCall(NIdentifier identifier, vector<NExpression*> *args) : identifier(identifier)
+        NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args)
         {
             this->identifier = identifier;
             this->args = args;
@@ -257,13 +259,14 @@ class NExpressionList : public NExpression
 class NFunctionDec : public NStatement
 {
     private:
-        NIdentifier identifier;
+        NIdentifier *identifier;
         vector<NIdentifier*> *args;
         NExpression *exp;
 
     public:
-        NFunctionDec(NIdentifier identifier, vector<NIdentifier*> *args, NExpression *exp) : identifier(identifier)
+        NFunctionDec(NIdentifier *identifier, vector<NIdentifier*> *args, NExpression *exp)
         {
+            this->identifier = identifier;
             this->args = args;
             this->exp = exp;
         }
@@ -272,10 +275,11 @@ class NFunctionDec : public NStatement
 class NImport : public NStatement
 {
     private:
-        NIdentifier identifier;
+        NIdentifier *identifier;
 
     public:
-        NImport(NIdentifier identifier) : identifier(identifier)
+        NImport(NIdentifier *identifier)
         {
+            this->identifier = identifier;
         }
 };

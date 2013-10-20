@@ -61,8 +61,8 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     ","              return(COLON);
     "function"       return(FUNCTION);
     "import"         return(IMPORT);
-    {IDENTIFIER}     { *(yylval.t_string) = yytext; return(IDENTIFIER); }
-    ([+|-]?){DIGIT}+ { yylval.t_number = atoi(yytext); return(NUMBER); }
+    {IDENTIFIER}     { *(yylval.str_identifier) = yytext; return(IDENTIFIER); }
+    ([+|-]?){DIGIT}+ { yylval.integer = atoi(yytext); return(NUMBER); }
     {WHITESPACE}+   ;
     {NEWLINE}+      ;
     "/*" 	    BEGIN(INCOMMENT);
@@ -78,7 +78,7 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 <INSTRING>
 { 
    "\\\""  myStr = (myStr + "\"");
-   "\""    { *(yylval.t_string) = myStr; return(STRING); }
+   "\""    { *(yylval.str_value) = myStr; return(STRING); }
    .	   myStr = (myStr + yytext);
 }
 %%
