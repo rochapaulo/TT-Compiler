@@ -69,7 +69,7 @@ printf("ERROR: %s\n", error);
 %type <tyfields> tyfields
 %type <leftValue> leftValue
 %type <identifier> identifier
-%type <int> dimensions
+%type <integer> dimensions
 
 %%
 program
@@ -268,19 +268,18 @@ break_exp
 array_creation 
     : identifier dimensions
     {
-        $$ = new NArrayCreation($1, $2);
+        $$ = new NArrayCreation($1, 0);
     }
     ;
 
 dimensions
     : LBRACKET RBRACKET
     {
-        int i = 1;
-        $$ = i;
+        $$ = 1;
     }
-    | LBRACKET RBRACKET COLON dimensions
+    | dimensions COLON LBRACKET RBRACKET
     {
-       $$ = $4 + 1; 
+       $$ = $1 + 1;
     }
     ;
 
