@@ -4,6 +4,7 @@
 
 using namespace std;
 
+class Node;
 class NExpression;
 class NStatement;
 class AST_Program;
@@ -34,18 +35,23 @@ class Node
         {
         }
 
+        virtual string to_string() = 0;
+
         void set_line(int lin)
         {
             this->lin = lin;
         }
-        
+
         void set_column(int col)
         {
             this->col = col;
         }
 
-        virtual string to_string() = 0;
-
+	protected:
+	string get_str_from(vector<Node*> values)
+	{
+		return "";
+	}
 };
 
 class NExpression : public Node
@@ -69,11 +75,17 @@ class AST_Program : public Node
             this->exp = exp;
         }
 
-        string to_string()
+        virtual string to_string()
         {
             stringstream stream;
-            stream << "<STATEMENTS_SECTION>\n" << "</STATEMENTS_SECTION>\n"
-                   << "<EXPRESSION_SECTION>\n" << exp->to_string() << "</EXPRESSION_SECTION>\n";
+            stream << "<AST_PROGRAM>\n";
+            if (stmList != NULL) {
+                 stream << "<STATEMENTS_SECTION>\n" << "</STATEMENTS_SECTION>\n";
+            };
+            if (exp != NULL) {
+                stream << "<EXPRESSION_SECTION>\n" << exp->to_string() << "<EXPRESSION_SECTION>";
+            };
+            stream << "</AST_PROGRAM>\n";
             return (stream.str());
         }
 };
@@ -93,14 +105,14 @@ class NBinaryOperation : public NExpression
             this->op = op;
         }
 
-        string to_string()
+        virtual string to_string()
         {
             stringstream stream;
             stream << "<BINARY_OPERATION>\n" 
-                   << "<RIGHT_EXPRESSION>\n" << rExp->to_string() << "</RIGHT_EXPRESSION>\n"
-                   << "<OPERATION\n>" << op << "\n</OPERATION>\n"
-                   << "<LEFT_EXPRESSION>\n"  << lExp->to_string() << "</LEFT_EXPRESSION>\n"
-                   << "</BINARY_OPERATION>\n";
+                << "<RIGHT_EXPRESSION>\n" << rExp->to_string() << "</RIGHT_EXPRESSION>\n"
+                << "<OPERATION\n>" << op << "\n</OPERATION>\n"
+                << "<LEFT_EXPRESSION>\n"  << lExp->to_string() << "</LEFT_EXPRESSION>\n"
+                << "</BINARY_OPERATION>\n";
             return stream.str();
         }
 };
@@ -109,14 +121,14 @@ class NInteger : public NExpression
 {
     public:
         int value;
-    
+
     public:
         NInteger(int value)
         {
             this->value = value;
         }
 
-        string to_string()
+        virtual string to_string()
         {
             stringstream stream;
             stream << "<INTEGER>\n" << value << "\n</INTEGER>\n";
@@ -135,7 +147,7 @@ class NNegation : public NExpression
             this->exp = exp;
         }
 
-        string to_string()
+        virtual string to_string()
         {
             stringstream stream;
             stream << "<NEGATION>\n" + exp->to_string() + "</NEGATION>\n";
@@ -153,8 +165,8 @@ class NReturn : public NExpression
         {
             this->exp = exp;
         }
-        
-        string to_string()
+
+        virtual string to_string()
         {
             stringstream stream;
             stream << "<RETURN\n>" << exp->to_string() << "</RETURN>\n";
@@ -173,7 +185,7 @@ class NIdentifier : public NExpression
             this->identifier = identifier;
         }
 
-        string to_string()
+        virtual string to_string()
         {
             stringstream stream;
             stream << "<IDENTIFIER>\n" << identifier << "</IDENTIFIER>\n";
@@ -186,7 +198,7 @@ class NLValue : public NExpression
     public:
         NIdentifier *identifier;
         vector <NExpression*> *indexList;
-        
+
     public:
         NLValue(NIdentifier *identifier, vector <NExpression*> *indexList)
         {
@@ -194,10 +206,11 @@ class NLValue : public NExpression
             this->indexList = indexList;
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<LVALUE>\n" << identifier->to_string() << "</LVALUE>\n";
+            return stream.str();
         }
 };
 
@@ -214,10 +227,11 @@ class NAssign : public NExpression
             this->exp = exp;
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<ASSIGN>\n" << lvalue->to_string() << exp->to_string() << "</ASSIGN>\n";
+            return stream.str();
         }
 };
 
@@ -236,10 +250,16 @@ class NIf : public NExpression
             this->falseExp = falseExp;
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<IF>\n" << cond->to_string()
+                << "<THEN>\n" << trueExp->to_string() << "</THEN>\n";
+            if (falseExp == NULL) {
+                stream << "<ELSE>\n" << falseExp->to_string() << "</ELSE>\n";
+            }
+            stream << "</IF>\n";
+            return stream.str();
         }
 };
 
@@ -256,10 +276,13 @@ class NWhile : public NExpression
             this->body = body;
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<WHILE>\n" << cond->to_string() 
+                << "<DO>\n" << body->to_string() << "</DO>\n"
+                << "</WHILE>\n";
+            return stream.str();
         }
 };
 
@@ -280,10 +303,15 @@ class NFor : public NExpression
             this->body = body;
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<FOR>\n" << identifier->to_string()
+                << "<ASSIGN>\n" << initExp->to_string() << "</ASSIGN>\n"
+                << "<TO>\n" << endExp->to_string() << "</TO>\n"
+                << "<DO>\n" << body->to_string() << "</DO>\n"
+                << "</FOR>\n";
+            return stream.str();
         }
 };
 
@@ -294,10 +322,11 @@ class NBreak : public NExpression
         {
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<BREAK>\n" << "</BREAK>\n";
+            return stream.str();
         }
 };
 
@@ -314,10 +343,14 @@ class NArrayCreation : public NExpression
             this->dimension = dimension;
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<ARRAY_CREATION>\n"
+                << identifier->to_string()
+                << "Dimension: " << dimension << "\n"
+                << "</ARRAY_CREATION>\n";
+            return stream.str();
         }
 };
 
@@ -335,10 +368,14 @@ class NFunctionCall : public NExpression
             this->args = args;
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<FUNCTION_CALL>\n"
+                << identifier->to_string()
+                //		   << Node::get_str_from(&args)
+                << "</FUNCTION_CALL>\n";
+            return stream.str();
         }
 };
 
@@ -353,17 +390,18 @@ class NExpressionList : public NExpression
             this->expList = expList;
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << ""; //Node::get_str_from(&expList);
+            return stream.str();
         }
 };
 
 
 /*
-    DECLARATIONS
-*/
+   DECLARATIONS
+ */
 
 class NFunctionDec : public NStatement
 {
@@ -380,10 +418,15 @@ class NFunctionDec : public NStatement
             this->exp = exp;
         }
 
-        string to_string()
+        virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<FUNCTION_DEC>\n"
+                << identifier->to_string()
+                << "<ARGS>\n" << Node::get_str_from(*args) << "</ARGS>\n"
+                << exp->to_string()
+                << "</FUNCTION_DEC>\n";
+            return stream.str();
         }
 };
 
@@ -398,7 +441,7 @@ class NImport : public NStatement
             this->identifier = identifier;
         }
 
-        string to_string()
+        virtual string to_string()
         {
             // TODO
             return "<TODO>";
