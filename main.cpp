@@ -1,20 +1,10 @@
 #include <iostream>
-#include <stdio.h>
+#include <fstream>
+#include <cstring>
 #include <stdlib.h>
+#include <stdio.h>
 #include "Node.h"
 
-#define PLUS    273
-#define MINUS   274
-#define MUL     275
-#define DIV     276
-#define EQUAL   277
-#define OPDIF   278
-#define OPGE    279
-#define OPLE    280
-#define OPG     281
-#define OPL     282
-#define AND     283
-#define OR      284
 
 using namespace std;
 
@@ -48,28 +38,14 @@ int main(int argc, char *argv[]) {
     cout << "Parsing Program ..." << endl;
     yyparse();
     cout << "Parse complete." << endl;
+
+    ofstream outfile(argv[2]);
+    outfile << ast_program->to_string();
+
+
     fclose(p_infile);
     fclose(p_outfile);
 
-    cout << "Result: " << endl;
-    NBinaryOperation binop = *((NBinaryOperation*) ast_program->exp);
-    cout << " -leftExp: " << (*(NInteger*)binop.lExp).value << endl;
-    cout << " -operation: " << getOperation(binop.op) << endl;
-    cout << " -rightExp: " << (*(NInteger*)binop.rExp).value << endl;
-
-    cout << binop.to_string() << endl;
 
     return 1;
-};
-
-string getOperation(int key) {
-    switch (key) {
-        case PLUS:
-            return "PLUS";
-        break;
-
-        case MINUS:
-            return "MINUS";
-        break;
-    }
 };
