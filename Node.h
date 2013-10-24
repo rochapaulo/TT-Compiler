@@ -46,12 +46,6 @@ class Node
         {
             this->col = col;
         }
-
-	protected:
-	string get_str_from(vector<Node*> values)
-	{
-		return "";
-	}
 };
 
 class NExpression : public Node
@@ -371,10 +365,12 @@ class NFunctionCall : public NExpression
         virtual string to_string()
         {
             stringstream stream;
-            stream << "<FUNCTION_CALL>\n"
-                << identifier->to_string()
-                //		   << Node::get_str_from(&args)
-                << "</FUNCTION_CALL>\n";
+            stream << "<FUNCTION_CALL>\n"<< identifier->to_string();
+            for (int i = 0; i < args->size(); i++)
+            {
+                stream << (args->at(i))->to_string();
+            }
+            stream << "</FUNCTION_CALL>\n";
             return stream.str();
         }
 };
@@ -393,7 +389,12 @@ class NExpressionList : public NExpression
         virtual string to_string()
         {
             stringstream stream;
-            stream << ""; //Node::get_str_from(&expList);
+            stream << "<EXPRESSION_LIST>\n";
+            for (int i = 0; i < expList->size(); i++) 
+            {
+                stream << (expList->at(i))->to_string();
+            }
+            stream << "</EXPRESSION_LIST>\n";
             return stream.str();
         }
 };
@@ -421,11 +422,15 @@ class NFunctionDec : public NStatement
         virtual string to_string()
         {
             stringstream stream;
-            stream << "<FUNCTION_DEC>\n"
-                << identifier->to_string()
-                << "<ARGS>\n" << Node::get_str_from(*args) << "</ARGS>\n"
-                << exp->to_string()
-                << "</FUNCTION_DEC>\n";
+            stream << "<FUNCTION_DEC>\n" << identifier->to_string() 
+                   <<"<ARGS>\n";
+            for(int i = 0; i < args->size(); i++)
+            {
+                stream << (args->at(i))->to_string();
+            }
+            stream << "</ARGS>\n"
+                   << "<BODY>\n" << exp->to_string() << "</body>\n"
+                   << "</FUNCTION_DEC>\n";
             return stream.str();
         }
 };
@@ -443,7 +448,8 @@ class NImport : public NStatement
 
         virtual string to_string()
         {
-            // TODO
-            return "<TODO>";
+            stringstream stream;
+            stream << "<IMPORT>\n" << identifier->to_string() << "</IMPORT>\n";
+            return stream.str();
         }
 };
