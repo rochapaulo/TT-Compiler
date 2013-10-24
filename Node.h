@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <sstream>
 
 using namespace std;
 
@@ -24,11 +25,15 @@ class NImport;
 
 class Node
 {
-    private:
+    public:
         int lin;
         int col;
 
     public:
+        virtual ~Node()
+        {
+        }
+
         void set_line(int lin)
         {
             this->lin = lin;
@@ -38,6 +43,9 @@ class Node
         {
             this->col = col;
         }
+
+        virtual string to_string() = 0;
+
 };
 
 class NExpression : public Node
@@ -50,7 +58,7 @@ class NStatement : public Node
 
 class AST_Program : public Node
 {
-    private:
+    public:
         vector <NStatement*> *stmList;
         NExpression *exp;
 
@@ -60,27 +68,46 @@ class AST_Program : public Node
             this->stmList = stmList;
             this->exp = exp;
         }
+
+        string to_string()
+        {
+            stringstream stream;
+            stream << "<STATEMENTS_SECTION>\n" << "</STATEMENTS_SECTION>\n"
+                   << "<EXPRESSION_SECTION>\n" << exp->to_string() << "</EXPRESSION_SECTION>\n";
+            return (stream.str());
+        }
 };
 
 class NBinaryOperation : public NExpression
 {
-    private:
+    public:
         NExpression *rExp;
         NExpression *lExp;
         int op;
 
     public:
-        NBinaryOperation(NExpression *rExp, int op, NExpression *lExp)
+        NBinaryOperation(NExpression *lExp, int op, NExpression *rExp)
         {
             this->rExp = rExp;
             this->lExp = lExp;
             this->op = op;
         }
+
+        string to_string()
+        {
+            stringstream stream;
+            stream << "<BINARY_OPERATION>\n" 
+                   << "<RIGHT_EXPRESSION>\n" << rExp->to_string() << "</RIGHT_EXPRESSION>\n"
+                   << "<OPERATION\n>" << op << "\n</OPERATION>\n"
+                   << "<LEFT_EXPRESSION>\n"  << lExp->to_string() << "</LEFT_EXPRESSION>\n"
+                   << "</BINARY_OPERATION>\n";
+            return stream.str();
+        }
 };
 
 class NInteger : public NExpression
 {
-    private:
+    public:
         int value;
     
     public:
@@ -88,11 +115,18 @@ class NInteger : public NExpression
         {
             this->value = value;
         }
+
+        string to_string()
+        {
+            stringstream stream;
+            stream << "<INTEGER>\n" << value << "\n</INTEGER>\n";
+            return stream.str();
+        }
 };
 
 class NNegation : public NExpression
 {
-    private:
+    public:
         NExpression *exp;
 
     public:
@@ -100,11 +134,18 @@ class NNegation : public NExpression
         {
             this->exp = exp;
         }
+
+        string to_string()
+        {
+            stringstream stream;
+            stream << "<NEGATION>\n" + exp->to_string() + "</NEGATION>\n";
+            return stream.str();
+        }
 };
 
 class NReturn : public NExpression
 {
-    private:
+    public:
         NExpression *exp;
 
     public:
@@ -112,11 +153,18 @@ class NReturn : public NExpression
         {
             this->exp = exp;
         }
+        
+        string to_string()
+        {
+            stringstream stream;
+            stream << "<RETURN\n>" << exp->to_string() << "</RETURN>\n";
+            return stream.str();
+        }
 };
 
 class NIdentifier : public NExpression
 {
-    private:
+    public:
         string *identifier;
 
     public:
@@ -124,11 +172,18 @@ class NIdentifier : public NExpression
         {
             this->identifier = identifier;
         }
+
+        string to_string()
+        {
+            stringstream stream;
+            stream << "<IDENTIFIER>\n" << identifier << "</IDENTIFIER>\n";
+            return stream.str();
+        }
 };
 
 class NLValue : public NExpression
 {
-    private:
+    public:
         NIdentifier *identifier;
         vector <NExpression*> *indexList;
         
@@ -138,11 +193,17 @@ class NLValue : public NExpression
             this->identifier = identifier; 
             this->indexList = indexList;
         }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
+        }
 };
 
 class NAssign : public NExpression
 {
-    private:
+    public:
         NLValue *lvalue;
         NExpression *exp;
 
@@ -152,11 +213,17 @@ class NAssign : public NExpression
             this->lvalue = lvalue;
             this->exp = exp;
         }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
+        }
 };
 
 class NIf : public NExpression
 {
-    private:
+    public:
         NExpression *cond;
         NExpression *trueExp;
         NExpression *falseExp;
@@ -168,11 +235,17 @@ class NIf : public NExpression
             this->trueExp = trueExp;
             this->falseExp = falseExp;
         }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
+        }
 };
 
 class NWhile : public NExpression
 {
-    private:
+    public:
         NExpression *cond;
         NExpression *body;
 
@@ -182,11 +255,17 @@ class NWhile : public NExpression
             this->cond = cond;
             this->body = body;
         }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
+        }
 };
 
 class NFor : public NExpression
 {
-    private:
+    public:
         NIdentifier *identifier;
         NExpression *initExp;
         NExpression *endExp;
@@ -200,6 +279,12 @@ class NFor : public NExpression
             this->endExp = endExp;
             this->body = body;
         }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
+        }
 };
 
 class NBreak : public NExpression
@@ -208,11 +293,17 @@ class NBreak : public NExpression
         NBreak()
         {
         }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
+        }
 };
 
 class NArrayCreation : public NExpression
 {
-    private:
+    public:
         NIdentifier *identifier;
         int dimension;
 
@@ -222,12 +313,18 @@ class NArrayCreation : public NExpression
             this->identifier = identifier;
             this->dimension = dimension;
         }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
+        }
 };
 
 
 class NFunctionCall : public NExpression
 {
-    private:
+    public:
         NIdentifier *identifier;
         vector <NExpression*> *args;
 
@@ -237,17 +334,29 @@ class NFunctionCall : public NExpression
             this->identifier = identifier;
             this->args = args;
         }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
+        }
 };
 
 class NExpressionList : public NExpression
 {
-    private:
+    public:
         vector<NExpression*> *expList;
 
     public:
         NExpressionList(vector<NExpression*> *expList)
         {
             this->expList = expList;
+        }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
         }
 };
 
@@ -258,7 +367,7 @@ class NExpressionList : public NExpression
 
 class NFunctionDec : public NStatement
 {
-    private:
+    public:
         NIdentifier *identifier;
         vector<NIdentifier*> *args;
         NExpression *exp;
@@ -270,16 +379,28 @@ class NFunctionDec : public NStatement
             this->args = args;
             this->exp = exp;
         }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
+        }
 };
 
 class NImport : public NStatement
 {
-    private:
+    public:
         NIdentifier *identifier;
 
     public:
         NImport(NIdentifier *identifier)
         {
             this->identifier = identifier;
+        }
+
+        string to_string()
+        {
+            // TODO
+            return "<TODO>";
         }
 };

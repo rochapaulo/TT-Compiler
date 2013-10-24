@@ -2,6 +2,9 @@
 
 #include "Node.h"
 extern int yylex();
+extern int yywrap();
+AST_Program* ast_program;
+
 void yyerror(const char *error) 
 { 
 printf("ERROR: %s\n", error); 
@@ -75,7 +78,7 @@ printf("ERROR: %s\n", error);
 program
     : decs exp
     {
-        $$ = new AST_Program($1, $2);
+        ast_program = new AST_Program($1, $2);
     }
     ;
 
@@ -135,9 +138,9 @@ binary_exp
     ;
 
 term 
-    : exp
+    : LPAREN exp RPAREN
     {
-        $$ = $1;
+        $$ = $2;
     }
     | NUMBER
     {

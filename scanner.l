@@ -19,7 +19,7 @@ DIGIT [0-9]
 WHITESPACE [\t\ ]
 NEWLINE [\n\r]
 IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)* 
-%soption noyywrap
+%option noyywrap
 
 %x INCOMMENT
 %x INSTRING
