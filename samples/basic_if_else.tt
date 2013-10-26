@@ -1,0 +1,6 @@
+
+if i = 0 then
+    i := 1
+else
+    i := 2
+

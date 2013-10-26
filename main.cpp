@@ -36,11 +36,13 @@ int main(int argc, char *argv[]) {
 
     yyin = p_infile;
     cout << "Parsing Program ..." << endl;
-    yyparse();
-    cout << "Parse complete." << endl;
-
-    ofstream outfile(argv[2]);
-    outfile << ast_program->to_string();
+    if (yyparse() == 0)	{
+        cout << "Parse complete." << endl;
+        
+	ofstream outfile(argv[2]);
+        outfile << ast_program->to_string();
+   } else
+        cout << "TODO: get error (lin, col)." << endl;
 
 
     fclose(p_infile);
@@ -48,4 +50,6 @@ int main(int argc, char *argv[]) {
 
 
     return 1;
-};
+}
+
+

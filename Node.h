@@ -74,10 +74,15 @@ class AST_Program : public Node
             stringstream stream;
             stream << "<AST_PROGRAM>\n";
             if (stmList != NULL) {
-                 stream << "<STATEMENTS_SECTION>\n" << "</STATEMENTS_SECTION>\n";
+                 stream << "<STATEMENTS_SECTION>\n"; 
+		 
+		 for (int i = 0; i < stmList->size(); i++)
+		     stream << stmList->at(i)->to_string();
+
+		 stream << "</STATEMENTS_SECTION>\n";
             };
             if (exp != NULL) {
-                stream << "<EXPRESSION_SECTION>\n" << exp->to_string() << "<EXPRESSION_SECTION>";
+                stream << "<EXPRESSION_SECTION>\n" << exp->to_string() << "<EXPRESSION_SECTION>\n";
             };
             stream << "</AST_PROGRAM>\n";
             return (stream.str());
@@ -103,9 +108,9 @@ class NBinaryOperation : public NExpression
         {
             stringstream stream;
             stream << "<BINARY_OPERATION>\n" 
-                << "<RIGHT_EXPRESSION>\n" << rExp->to_string() << "</RIGHT_EXPRESSION>\n"
-                << "<OPERATION\n>" << op << "\n</OPERATION>\n"
                 << "<LEFT_EXPRESSION>\n"  << lExp->to_string() << "</LEFT_EXPRESSION>\n"
+                << "<OPERATION>\n" << op << "\n</OPERATION>\n"
+                << "<RIGHT_EXPRESSION>\n" << rExp->to_string() << "</RIGHT_EXPRESSION>\n"
                 << "</BINARY_OPERATION>\n";
             return stream.str();
         }
@@ -163,7 +168,7 @@ class NReturn : public NExpression
         virtual string to_string()
         {
             stringstream stream;
-            stream << "<RETURN\n>" << exp->to_string() << "</RETURN>\n";
+            stream << "<RETURN>\n" << exp->to_string() << "</RETURN>\n";
             return stream.str();
         }
 };
@@ -171,18 +176,18 @@ class NReturn : public NExpression
 class NIdentifier : public NExpression
 {
     public:
-        string *identifier;
+        string identifier;
 
     public:
-        NIdentifier(string *identifier)
+        NIdentifier(char *identifier)
         {
-            this->identifier = identifier;
+	    this->identifier = identifier;
         }
 
         virtual string to_string()
         {
             stringstream stream;
-            stream << "<IDENTIFIER>\n" << identifier << "</IDENTIFIER>\n";
+            stream << "<IDENTIFIER>\n" << identifier << "\n</IDENTIFIER>\n";
             return stream.str();
         }
 };
@@ -204,6 +209,12 @@ class NLValue : public NExpression
         {
             stringstream stream;
             stream << "<LVALUE>\n" << identifier->to_string() << "</LVALUE>\n";
+
+	    if (indexList != NULL){
+	        for (int i = 0; i < indexList->size(); i++)
+		    stream << "<INDEX>\n" << indexList->at(i)->to_string() << "</INDEX>\n";
+	    }
+
             return stream.str();
         }
 };
@@ -224,7 +235,10 @@ class NAssign : public NExpression
         virtual string to_string()
         {
             stringstream stream;
-            stream << "<ASSIGN>\n" << lvalue->to_string() << exp->to_string() << "</ASSIGN>\n";
+            stream << "<ASSIGN>\n" 
+	    	   << "<LEFT_EXPRESSION>\n" << lvalue->to_string() << "</LEFT_EXPRESSION>\n"
+		   << "<RIGHT_EXPRESSION>\n" << exp->to_string() << "</RIGHT_EXPRESSION>\n"
+		   << "</ASSIGN>\n";
             return stream.str();
         }
 };
@@ -245,11 +259,11 @@ class NIf : public NExpression
         }
 
         virtual string to_string()
-        {
+        {   
             stringstream stream;
             stream << "<IF>\n" << cond->to_string()
                 << "<THEN>\n" << trueExp->to_string() << "</THEN>\n";
-            if (falseExp == NULL) {
+            if (falseExp != NULL) {
                 stream << "<ELSE>\n" << falseExp->to_string() << "</ELSE>\n";
             }
             stream << "</IF>\n";
@@ -342,7 +356,9 @@ class NArrayCreation : public NExpression
             stringstream stream;
             stream << "<ARRAY_CREATION>\n"
                 << identifier->to_string()
-                << "Dimension: " << dimension << "\n"
+                << "<DIMENSIONS>\n" 
+		<< dimension 
+		<< "\n</DIMENSIONS>\n"
                 << "</ARRAY_CREATION>\n";
             return stream.str();
         }
@@ -425,9 +441,8 @@ class NFunctionDec : public NStatement
             stream << "<FUNCTION_DEC>\n" << identifier->to_string() 
                    <<"<ARGS>\n";
             for(int i = 0; i < args->size(); i++)
-            {
                 stream << (args->at(i))->to_string();
-            }
+         
             stream << "</ARGS>\n"
                    << "<BODY>\n" << exp->to_string() << "</body>\n"
                    << "</FUNCTION_DEC>\n";

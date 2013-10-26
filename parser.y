@@ -7,30 +7,30 @@ AST_Program* ast_program;
 
 void yyerror(const char *error) 
 { 
-printf("ERROR: %s\n", error); 
+    printf("ERROR: %s\n", error); 
 }
 %}
 
 %union {
     Node 	               	*program;
-    string             		*str_value;
-    string                  *str_identifier;
+    char             		*str_value;
+    char                  	*str_identifier;
     int                 	integer;
-    int		        		op;
+    int		        	op;
     NExpression         	*exp;
     NStatement          	*dec;
-    NIdentifier             *identifier;
-    NLValue                 *leftValue;
+    NIdentifier             	*identifier;
+    NLValue                 	*leftValue;
     vector<NExpression*>	*exps;
-    vector<NStatement*>     *decs;
-    vector<NIdentifier*>    *tyfields;
+    vector<NStatement*>     	*decs;
+    vector<NIdentifier*>    	*tyfields;
     NFunctionDec        	*fundec;
 }
 
 %token <integer> NUMBER
 %token <str_value> STRING
+%token <str_identifier> IDENTIFIER
 
-%token IDENTIFIER
 %token IF THEN ELSE FOR TO DO WHILE BREAK PRINT RETURN IMPORT FUNCTION
 %token PLUS MINUS MUL DIV EQUAL OPDIF OPGE OPLE OPG OPL AND OR ASSIGN
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET SEMICOLON
@@ -61,7 +61,7 @@ printf("ERROR: %s\n", error);
 %type <exps> dimension_acc
 %type <exps> args
 
-%type <op>op
+%type <op> op
 
 %type <dec> dec
 %type <dec> fundec
@@ -83,48 +83,64 @@ program
     ;
 
 exp
-    : binary_exp
+    : term
     {
+        printf("exp->term\n");
+        $$ = $1;
+    }
+    | binary_exp
+    {
+        printf("exp->binary_exp\n");
         $$ = $1;
     }
     | neg_exp
     {
+        printf("exp->neg_exp\n");
         $$ = $1;
     }
     | return_exp
     {
+        printf("exp->return_exp\n");
         $$ = $1;
     }
     | assign
     {
+        printf("exp->assign\n");
         $$ = $1;
     }
     | if_exp
     {
+        printf("exp->if_exp\n");
         $$ = $1;
     }
     | while_exp
     {
+        printf("exp->while_exp\n");
         $$ = $1;
     }
     | for_exp
     {
+        printf("exp->for_exp\n");
         $$ = $1;
     }
     | break_exp
     {
+        printf("exp->break_exp\n");
         $$ = $1;
     }
     | array_creation
     {
+        printf("exp->array_creation\n");
         $$ = $1;
     }
     | funcall
     {
+        printf("exp->funcall\n");
         $$ = $1;
     } 
     | LPAREN exps RPAREN
     {
+        printf("exp->exps\n");
         $$ = new NExpressionList($2);
     }
     ;
@@ -133,17 +149,25 @@ exp
 binary_exp
     : term op term
     {
+        printf("binary_exp->term op term\n");
         $$ = new NBinaryOperation($1, $2, $3);
     }
     ;
 
 term 
-    : LPAREN exp RPAREN
+    : leftValue
     {
+        printf("term->leftValue\n");
+        $$ = $1;
+    }
+    | LPAREN exp RPAREN
+    {
+        printf("term->LPAREN exp RPAREN\n");
         $$ = $2;
     }
     | NUMBER
     {
+        printf("term->NUMBER\n");
         $$ = new NInteger(yylval.integer);
     }
     ;
@@ -151,42 +175,52 @@ term
 op 
     : PLUS
     {
+        printf("op->PLUS\n");
         $$ = PLUS;
     }
     | MINUS
     {
+        printf("op->MINUS\n");
         $$ = MINUS;
     }
     | MUL
     {
+        printf("op->MUL\n");
         $$ = MUL;
     }
     | DIV 
     {
+        printf("op->DIV\n");
         $$ = DIV;
     }
     | OPG
     {
+        printf("op->OPG\n");
         $$ = OPG;
     }
     | OPGE
     {
+        printf("op->OPGE\n");
         $$ = OPGE;
     }
     | OPL
     {
+        printf("op->OPL\n");
         $$ = OPL;
     }
     | OPLE
     {
+        printf("op->OPLE\n");
         $$ = OPLE;
     }
     | OPDIF
     {
+        printf("op->OPDIF\n");
         $$ = OPDIF;
     }
     | EQUAL
     {
+        printf("op->EQUAL\n");
         $$ = EQUAL;
     }
     ;
@@ -194,6 +228,7 @@ op
 neg_exp
     : MINUS exp
     {
+        printf("neg_exp->MINUS exp\n");
         $$ = new NNegation($2);
     }
     ;
@@ -201,6 +236,7 @@ neg_exp
 assign 
     :  leftValue ASSIGN exp
     {
+        printf("assign->leftValue ASSIGN exp\n");
         $$ = new NAssign($1, $3);
     }
     ;
@@ -208,23 +244,28 @@ assign
 leftValue
     : identifier 
     {
-          $$ = new NLValue($1, NULL);
+        printf("leftValue->identifier\n");
+        $$ = new NLValue($1, NULL);
     }
     | identifier dimension_acc
     {
-          $$ = new NLValue($1, $2);
+        printf("leftValue->identifier dimensions_acc\n"); 
+        $$ = new NLValue($1, $2);
     }
     ;
 
 dimension_acc
     :  LBRACKET exp RBRACKET
     {
+        printf("dimension_acc->LBRACKET exp RBRACKET\n");
         vector<NExpression*> *expList;
+	expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
     	expList->push_back($2);
-	    $$ = expList;
+	$$ = expList;
     }
     |  LBRACKET exp RBRACKET dimension_acc
     {
+        printf("dimenstion_acc->LBRACKET exp LBRACKET dimensions_acc\n");
         $4->push_back($2);
     	$$ = $4;
     }
@@ -232,10 +273,12 @@ dimension_acc
 if_exp 
     : IF exp THEN exp
     {
+        printf("if_exp->IF exp THEN exp\n");
         $$ = new NIf($2, $4, NULL);
     }
     | IF exp THEN exp ELSE exp
     {
+        printf("if_exp->IF exp THEN exp ELSE exp\n");
         $$ = new NIf($2, $4, $6);
     }
     ;
@@ -243,6 +286,7 @@ if_exp
 while_exp 
     : WHILE exp DO exp
     {
+        printf("while_exp->WHILE exp DO exp\n");
         $$ = new NWhile($2, $4);
     }
     ;
@@ -250,6 +294,7 @@ while_exp
 for_exp
     : FOR identifier ASSIGN exp TO exp DO exp
     {
+        printf("for_exp->FOR identifier ASSIGN exp TO exp DO exp\n");
         $$ = new NFor($2, $4, $6, $8);
     }
     ;
@@ -257,6 +302,7 @@ for_exp
 return_exp
     : RETURN exp
     {
+        printf("return_exp->RETURN exp\n");
         $$ = new NReturn($2);
     }
     ;
@@ -264,6 +310,7 @@ return_exp
 break_exp
     : BREAK
     {
+        printf("break_exp->BREAK\n");
         $$ = new NBreak();
     }
     ;
@@ -271,17 +318,20 @@ break_exp
 array_creation 
     : identifier dimensions
     {
-        $$ = new NArrayCreation($1, 0);
+        printf("array_creation->identifier dimensions\n");
+        $$ = new NArrayCreation($1, $2);
     }
     ;
 
 dimensions
     : LBRACKET RBRACKET
     {
+        printf("dimensions->LBRACKET RBRACKET\n");
         $$ = 1;
     }
-    | dimensions COLON LBRACKET RBRACKET
+    | dimensions LBRACKET RBRACKET
     {
+       printf("dimensions->dimensions LBRACKET RBRACKET\n");
        $$ = $1 + 1;
     }
     ;
@@ -289,10 +339,12 @@ dimensions
 funcall 
     : identifier LPAREN RPAREN
     {
+        printf("funcall->identifier LPAREN RPAREN\n");
         $$ = new NFunctionCall($1, NULL);
     }
     | identifier LPAREN args RPAREN
     {
+        printf("funcall->identifier LPAREN args RPAREN\n");
         $$ = new NFunctionCall($1, $3);
     }
     ;
@@ -300,12 +352,15 @@ funcall
 exps
     : exp
     {
+        printf("exps->exp\n");
     	vector<NExpression*> *expList;
-	    expList->push_back($1);
+	expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
+	expList->push_back($1);
     	$$ = expList;
     }
     | exps SEMICOLON exp
     {
+        printf("exps->exps SEMICOLON exp\n");
         $1->push_back($3);
         $$ = $1;
     }
@@ -314,12 +369,15 @@ exps
 args 
     : exp
     {
+        printf("args->exp\n");
         vector<NExpression*> *expList;
+	expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
         expList->push_back($1);
         $$ = expList;
     }
     | args COLON exp
     {
+        printf("args->args COLON exp\n");
         $1->push_back($3);
         $$ = $1;
     }
@@ -328,10 +386,12 @@ args
 decs
     : /* Empty */
     {
+        printf("decs->Empty\n");
         $$ = NULL;
     }
     | decseq
     {
+        printf("decs->decseq\n");
         $$ = $1;
     }
     ;
@@ -339,12 +399,15 @@ decs
 decseq
     : dec
     {
+        printf("decseq->dec\n");
         vector<NStatement*> * stmList;
+	stmList = (vector<NStatement*> *)malloc(sizeof(vector<NStatement*>));
         stmList->push_back($1);
         $$ = stmList;
     }
     | decseq dec
     {
+        printf("decseq->decseq dec\n");
         $1->push_back($2);
         $$ = $1;
     }
@@ -353,10 +416,12 @@ decseq
 dec 
     : fundec
     {
+        printf("dec->fundec\n");
         $$ = $1;
     }
     | import
     {
+        printf("dec->import");
         $$ = $1;
     }
     ;
@@ -364,14 +429,15 @@ dec
 fundec 
     : FUNCTION identifier LPAREN tyfields RPAREN EQUAL exp
     {
+        printf("fundec->FUNCTION identifier LPAREN typefields RPAREN EQUAL exp\n");
         $$ = new NFunctionDec($2, $4, $7);
     }
     ;
 
-
 import 
     : IMPORT OPL identifier OPG
     {
+        printf("import->IMPORT OPL identifier OPG\n");
         $$ = new NImport($3);
     }
     ;
@@ -379,17 +445,22 @@ import
 tyfields
     : /* Empty */
     {
-        vector<NIdentifier*> *identifierList;
-        $$ = identifierList;
+        printf("tyfields->Empty\n");
+	vector<NIdentifier*> *emptyList;
+	emptyList = (vector<NIdentifier*> *)malloc(sizeof(vector<NIdentifier*>));
+        $$ = emptyList;
     }
     | identifier
     {
+        printf("tyfields->identifier\n");
         vector<NIdentifier*> *fieldList;
+        fieldList = (vector<NIdentifier*> *)malloc(sizeof(vector<NIdentifier*>));
         fieldList->push_back($1);
         $$ = fieldList;
     }
     | tyfields COLON identifier
     {
+        printf("tyfields->tyfields COLON identifier\n");
         $1->push_back($3);
         $$ = $1;
     }
@@ -398,6 +469,7 @@ tyfields
 identifier 
     : IDENTIFIER
     {
+        printf("identifier->IDENTIFIER\n");
         $$ = new NIdentifier(yylval.str_identifier);
     }
     ;

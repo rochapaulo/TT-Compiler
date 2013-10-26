@@ -1,17 +1,17 @@
 %{
-    #include <string>
+//    #include <string>
     #include "Node.h"
     #include "parser.h"
 
     using namespace std;    
 
-    string myStr;
+    char * myStr;
    
     int number;
 
     void initString();
     void appendString(char *text);
-    void printMessage(char *str);
+    //void printMessage(char *str);
 
 %}
 LETTER [a-zA-Z]
@@ -61,12 +61,18 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     ","              return(COLON);
     "function"       return(FUNCTION);
     "import"         return(IMPORT);
-    {IDENTIFIER}     { *(yylval.str_identifier) = yytext; return(IDENTIFIER); }
-    ([+|-]?){DIGIT}+ { yylval.integer = atoi(yytext); return(NUMBER); }
+    {IDENTIFIER}     { 
+			yylval.str_identifier = yytext;
+			return(IDENTIFIER); 
+		     }
+    ([+|-]?){DIGIT}+ { 
+    			yylval.integer = atoi(yytext); 
+			return(NUMBER); 
+		     }
     {WHITESPACE}+   ;
     {NEWLINE}+      ;
     "/*" 	    BEGIN(INCOMMENT);
-    "\""	    myStr = "";
+    "\""	    initString();
     . 		    yyterminate();
 }
 <INCOMMENT>
@@ -77,8 +83,34 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 }
 <INSTRING>
 { 
-   "\\\""  myStr = (myStr + "\"");
-   "\""    { *(yylval.str_value) = myStr; return(STRING); }
-   .	   myStr = (myStr + yytext);
+   
+   "\\\"" { 
+   	      char *aux = (char *)malloc(sizeof(char));
+	      aux[0] = '\"';
+	      appendString(aux); 
+	  }
+   "\""   { 
+   	      yylval.str_value = myStr; 
+	      return(STRING);
+	  }
+   .      appendString(yytext);
+
 }
+
 %%
+
+void initString() {
+    
+    myStr = (char *)malloc(sizeof(char));
+    myStr[0] = '\0';
+
+    BEGIN(INSTRING);
+}
+
+void appendString(char *text) {
+    char *aux = (char *)malloc(strlen(myStr)+strlen(text)+1);
+    strcat(aux, myStr);
+    strcat(aux, text);
+    myStr = aux;
+}
+

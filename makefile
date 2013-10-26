@@ -7,6 +7,7 @@ all: $(EXEC) clean
 
 parser.cc: parser.y
 	@$(BISON) -d -o parser.cpp parser.y
+	if [ -a parser.hpp ]; then mv parser.hpp parser.h; fi;
 
 lex.yy.cc: scanner.l
 	@$(FLEX) scanner.l
