@@ -3,7 +3,7 @@ BISON = bison
 FLEX = flex
 EXEC = parser
 
-all: $(EXEC) clean
+all: $(EXEC) install
 
 parser.cc: parser.y
 	@$(BISON) -d -o parser.cpp parser.y
@@ -15,7 +15,7 @@ lex.yy.cc: scanner.l
 parser: parser.cc lex.yy.cc
 	@$(CC) -o parser parser.cpp lex.yy.c main.cpp -ll
 
-install: all
+install: clean
 	@mkdir -p build
 	@mv $(EXEC) build
 
