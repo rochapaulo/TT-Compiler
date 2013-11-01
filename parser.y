@@ -5,9 +5,9 @@
 extern int yylex();
 extern int yywrap();
 extern int yylineno, yycolumn;
-void yyerror(string err) 
+void yyerror(char *msg) 
 { 
-    printf("error on line %d, column %d\n",  yylineno, yycolumn); 
+    fprintf(stderr, "%s\n on line %d, column %d\n",  msg, yylineno, yycolumn); 
 }
 
 AST_Program* ast_program;

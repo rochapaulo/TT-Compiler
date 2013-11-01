@@ -1,16 +1,15 @@
 %{
-    #include <string.h>
-    #include "Node.h"
-    #include "parser.h"
+#include <string.h>
+#include "Node.h"
+#include "parser.h"
 
-    using namespace std;    
-
-    char * myStr;
+    char *myStr;
     int number;
     int yycolumn = 0;
 
+    extern void yyerror(char *);
     void initString();
-    void appendString(char *text);
+    void appendString(char *);
     void count();
 
 %}
@@ -63,19 +62,19 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     "function"		{ count(); return(FUNCTION);   }
     "import"		{ count(); return(IMPORT);     }
     {IDENTIFIER}	{ 
-				count();
-				yylval.str_identifier = yytext;
-				return(IDENTIFIER); 
+			  count();
+        		  yylval.str_identifier = yytext;
+		          return(IDENTIFIER); 
 			}
     ([+|-]?){DIGIT}+	{ 
-				yylval.integer = atoi(yytext); 
-				return(NUMBER); 
-			}
-    {WHITESPACE}+	{ count();                     }
+        		  yylval.integer = atoi(yytext); 
+   		          return(NUMBER); 
+            		}
+    {WHITESPACE}+  	{ count();                     }
     {NEWLINE}+		{ count();                     }
     "/*"		{ count(); BEGIN(INCOMMENT);   }
     "\""		{ count(); initString();       }
-    .			{ count(); yyterminate();      }
+    .			{ yyerror("Unknown character");}
 }
 <INCOMMENT>
 {
@@ -87,34 +86,37 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 { 
    
    "\\\""		{ 
-				count(); 
-				char *aux = (char *)malloc(sizeof(char));
-				aux[0] = '\"';
-				appendString(aux); 
-	                }
+	    		 count(); 
+    			 char *aux = (char *)malloc(sizeof(char));
+			 aux[0] = '\"';
+			 appendString(aux); 
+	            	}
    "\""			{ 
-				yylval.str_value = myStr; 
-				return(STRING);
+		    	 yylval.str_value = myStr; 
+			 return(STRING);
 			}
-   .			{ count(); appendString(yytext); }
+   .			{ count(); appendString(yytext);}
 }
 
 %%
 
-void initString() {
+void initString() 
+{
     myStr = (char *)malloc(sizeof(char));
     myStr[0] = '\0';
     BEGIN(INSTRING);
 }
 
-void appendString(char *text) {
+void appendString(char *text) 
+{
     char *aux = (char *)malloc(strlen(myStr)+strlen(text)+1);
     strcat(aux, myStr);
     strcat(aux, text);
     myStr = aux;
 }
 
-void count() {
+void count() 
+{
     for (int i = 0; i < yytext[i] != '\0'; i++) {
         if (yytext[i] == '\n') {
             yycolumn = 0;
