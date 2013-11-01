@@ -7,7 +7,7 @@ extern int yywrap();
 extern int yylineno, yycolumn;
 void yyerror(char *msg) 
 { 
-    fprintf(stderr, "%s\n on line %d, column %d\n",  msg, yylineno, yycolumn); 
+    fprintf(stderr, "%s on line %d, column %d\n",  msg, yylineno, yycolumn); 
 }
 
 AST_Program* ast_program;
