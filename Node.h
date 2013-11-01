@@ -63,8 +63,10 @@ class AST_Program : public Node
         NExpression *exp;
 
     public:
-        AST_Program(vector<NStatement*> *stmList, NExpression *exp)
+        AST_Program(vector<NStatement*> *stmList, NExpression *exp, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->stmList = stmList;
             this->exp = exp;
         }
@@ -77,9 +79,8 @@ class AST_Program : public Node
                  stream << "<STATEMENTS_SECTION>\n"; 
 		 
 		 for (int i = 0; i < stmList->size(); i++)
-		     stream << stmList->at(i)->to_string();
-
-		 stream << "</STATEMENTS_SECTION>\n";
+		    stream << stmList->at(i)->to_string();
+		    stream << "</STATEMENTS_SECTION>\n";
             };
             if (exp != NULL) {
                 stream << "<EXPRESSION_SECTION>\n" << exp->to_string() << "<EXPRESSION_SECTION>\n";
@@ -124,8 +125,10 @@ class NInteger : public NExpression
         int value;
 
     public:
-        NInteger(int value)
+        NInteger(int value, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->value = value;
         }
 
@@ -164,8 +167,10 @@ class NReturn : public NExpression
         NExpression *exp;
 
     public:
-        NReturn(NExpression *exp)
+        NReturn(NExpression *exp, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->exp = exp;
         }
 
@@ -183,9 +188,11 @@ class NIdentifier : public NExpression
         string identifier;
 
     public:
-        NIdentifier(char *identifier)
+        NIdentifier(char *identifier, int lin, int col)
         {
-	    this->identifier = identifier;
+            set_line(lin);
+            set_column(col);
+	        this->identifier = identifier;
         }
 
         virtual string to_string()
@@ -203,8 +210,10 @@ class NLValue : public NExpression
         vector <NExpression*> *indexList;
 
     public:
-        NLValue(NIdentifier *identifier, vector <NExpression*> *indexList)
+        NLValue(NIdentifier *identifier, vector <NExpression*> *indexList, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->identifier = identifier; 
             this->indexList = indexList;
         }
@@ -230,8 +239,10 @@ class NAssign : public NExpression
         NExpression *exp;
 
     public:
-        NAssign(NLValue *lvalue, NExpression *exp)
+        NAssign(NLValue *lvalue, NExpression *exp, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->lvalue = lvalue;
             this->exp = exp;
         }
@@ -255,8 +266,10 @@ class NIf : public NExpression
         NExpression *falseExp;
 
     public:
-        NIf(NExpression *cond, NExpression *trueExp, NExpression *falseExp)
+        NIf(NExpression *cond, NExpression *trueExp, NExpression *falseExp, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->cond = cond;
             this->trueExp = trueExp;
             this->falseExp = falseExp;
@@ -282,8 +295,10 @@ class NWhile : public NExpression
         NExpression *body;
 
     public:
-        NWhile(NExpression *cond, NExpression *body)
+        NWhile(NExpression *cond, NExpression *body, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->cond = cond;
             this->body = body;
         }
@@ -307,8 +322,10 @@ class NFor : public NExpression
         NExpression *body;        
 
     public:
-        NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body)
+        NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->identifier = identifier;
             this->initExp = initExp;
             this->endExp = endExp;
@@ -330,8 +347,10 @@ class NFor : public NExpression
 class NBreak : public NExpression
 {
     public:
-        NBreak()
+        NBreak(int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
         }
 
         virtual string to_string()
@@ -349,8 +368,10 @@ class NArrayCreation : public NExpression
         int dimension;
 
     public:
-        NArrayCreation(NIdentifier *identifier, int dimension)
+        NArrayCreation(NIdentifier *identifier, int dimension, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->identifier = identifier;
             this->dimension = dimension;
         }
@@ -361,8 +382,8 @@ class NArrayCreation : public NExpression
             stream << "<ARRAY_CREATION>\n"
                 << identifier->to_string()
                 << "<DIMENSIONS>\n" 
-		<< dimension 
-		<< "\n</DIMENSIONS>\n"
+		        << dimension 
+		        << "\n</DIMENSIONS>\n"
                 << "</ARRAY_CREATION>\n";
             return stream.str();
         }
@@ -376,8 +397,10 @@ class NFunctionCall : public NExpression
         vector <NExpression*> *args;
 
     public:
-        NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args)
+        NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->identifier = identifier;
             this->args = args;
         }
@@ -401,8 +424,10 @@ class NExpressionList : public NExpression
         vector<NExpression*> *expList;
 
     public:
-        NExpressionList(vector<NExpression*> *expList)
+        NExpressionList(vector<NExpression*> *expList, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->expList = expList;
         }
 
@@ -432,8 +457,10 @@ class NFunctionDec : public NStatement
         NExpression *exp;
 
     public:
-        NFunctionDec(NIdentifier *identifier, vector<NIdentifier*> *args, NExpression *exp)
+        NFunctionDec(NIdentifier *identifier, vector<NIdentifier*> *args, NExpression *exp, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->identifier = identifier;
             this->args = args;
             this->exp = exp;
@@ -460,8 +487,10 @@ class NImport : public NStatement
         NIdentifier *identifier;
 
     public:
-        NImport(NIdentifier *identifier)
+        NImport(NIdentifier *identifier, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->identifier = identifier;
         }
 

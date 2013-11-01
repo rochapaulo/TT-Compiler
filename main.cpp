@@ -9,8 +9,7 @@
 using namespace std;
 
 extern AST_Program * ast_program;
-extern FILE *yyin;
-extern FILE *yyout;
+extern FILE *yyin, *yyout;
 extern int yyparse();
 
 string getOperation(int);
@@ -44,10 +43,8 @@ int main(int argc, char *argv[]) {
    } else
         cout << "TODO: get error (lin, col)." << endl;
 
-
     fclose(p_infile);
     fclose(p_outfile);
-
 
     return 1;
 }

@@ -80,7 +80,7 @@ AST_Program* ast_program;
 program
     : decs exp
     {
-        ast_program = new AST_Program($1, $2);
+        ast_program = new AST_Program($1, $2, yylineno, yycolumn);
     }
     ;
 
@@ -143,7 +143,7 @@ exp
     | LPAREN exps RPAREN
     {
         printf("exp->exps\n");
-        $$ = new NExpressionList($2);
+        $$ = new NExpressionList($2, yylineno, yycolumn);
     }
     ;
 
@@ -170,7 +170,7 @@ term
     | NUMBER
     {
         printf("term->NUMBER\n");
-        $$ = new NInteger(yylval.integer);
+        $$ = new NInteger(yylval.integer, yylineno, yycolumn);
     }
     ;
 
@@ -239,7 +239,7 @@ assign
     :  leftValue ASSIGN exp
     {
         printf("assign->leftValue ASSIGN exp\n");
-        $$ = new NAssign($1, $3);
+        $$ = new NAssign($1, $3, yylineno, yycolumn);
     }
     ;
 
@@ -247,12 +247,12 @@ leftValue
     : identifier 
     {
         printf("leftValue->identifier\n");
-        $$ = new NLValue($1, NULL);
+        $$ = new NLValue($1, NULL, yylineno, yycolumn);
     }
     | identifier dimension_acc
     {
         printf("leftValue->identifier dimensions_acc\n"); 
-        $$ = new NLValue($1, $2);
+        $$ = new NLValue($1, $2, yylineno, yycolumn);
     }
     ;
 
@@ -261,9 +261,9 @@ dimension_acc
     {
         printf("dimension_acc->LBRACKET exp RBRACKET\n");
         vector<NExpression*> *expList;
-	expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
+    	expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
     	expList->push_back($2);
-	$$ = expList;
+	    $$ = expList;
     }
     |  LBRACKET exp RBRACKET dimension_acc
     {
@@ -276,12 +276,12 @@ if_exp
     : IF exp THEN exp
     {
         printf("if_exp->IF exp THEN exp\n");
-        $$ = new NIf($2, $4, NULL);
+        $$ = new NIf($2, $4, NULL, yylineno, yycolumn);
     }
     | IF exp THEN exp ELSE exp
     {
         printf("if_exp->IF exp THEN exp ELSE exp\n");
-        $$ = new NIf($2, $4, $6);
+        $$ = new NIf($2, $4, $6, yylineno, yycolumn);
     }
     ;
 
@@ -289,7 +289,7 @@ while_exp
     : WHILE exp DO exp
     {
         printf("while_exp->WHILE exp DO exp\n");
-        $$ = new NWhile($2, $4);
+        $$ = new NWhile($2, $4, yylineno, yycolumn);
     }
     ;
 
@@ -297,7 +297,7 @@ for_exp
     : FOR identifier ASSIGN exp TO exp DO exp
     {
         printf("for_exp->FOR identifier ASSIGN exp TO exp DO exp\n");
-        $$ = new NFor($2, $4, $6, $8);
+        $$ = new NFor($2, $4, $6, $8, yylineno, yycolumn);
     }
     ;
 
@@ -305,7 +305,7 @@ return_exp
     : RETURN exp
     {
         printf("return_exp->RETURN exp\n");
-        $$ = new NReturn($2);
+        $$ = new NReturn($2, yylineno, yycolumn);
     }
     ;
 
@@ -313,7 +313,7 @@ break_exp
     : BREAK
     {
         printf("break_exp->BREAK\n");
-        $$ = new NBreak();
+        $$ = new NBreak(yylineno, yycolumn);
     }
     ;
 
@@ -321,7 +321,7 @@ array_creation
     : identifier dimensions
     {
         printf("array_creation->identifier dimensions\n");
-        $$ = new NArrayCreation($1, $2);
+        $$ = new NArrayCreation($1, $2, yylineno, yycolumn);
     }
     ;
 
@@ -342,12 +342,12 @@ funcall
     : identifier LPAREN RPAREN
     {
         printf("funcall->identifier LPAREN RPAREN\n");
-        $$ = new NFunctionCall($1, NULL);
+        $$ = new NFunctionCall($1, NULL, yylineno, yycolumn);
     }
     | identifier LPAREN args RPAREN
     {
         printf("funcall->identifier LPAREN args RPAREN\n");
-        $$ = new NFunctionCall($1, $3);
+        $$ = new NFunctionCall($1, $3, yylineno, yycolumn);
     }
     ;
 
@@ -356,8 +356,8 @@ exps
     {
         printf("exps->exp\n");
     	vector<NExpression*> *expList;
-	expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
-	expList->push_back($1);
+	    expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
+	    expList->push_back($1);
     	$$ = expList;
     }
     | exps SEMICOLON exp
@@ -373,7 +373,7 @@ args
     {
         printf("args->exp\n");
         vector<NExpression*> *expList;
-	expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
+	    expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
         expList->push_back($1);
         $$ = expList;
     }
@@ -403,7 +403,7 @@ decseq
     {
         printf("decseq->dec\n");
         vector<NStatement*> * stmList;
-	stmList = (vector<NStatement*> *)malloc(sizeof(vector<NStatement*>));
+	    stmList = (vector<NStatement*> *)malloc(sizeof(vector<NStatement*>));
         stmList->push_back($1);
         $$ = stmList;
     }
@@ -432,7 +432,7 @@ fundec
     : FUNCTION identifier LPAREN tyfields RPAREN EQUAL exp
     {
         printf("fundec->FUNCTION identifier LPAREN typefields RPAREN EQUAL exp\n");
-        $$ = new NFunctionDec($2, $4, $7);
+        $$ = new NFunctionDec($2, $4, $7, yylineno, yycolumn);
     }
     ;
 
@@ -440,7 +440,7 @@ import
     : IMPORT OPL identifier OPG
     {
         printf("import->IMPORT OPL identifier OPG\n");
-        $$ = new NImport($3);
+        $$ = new NImport($3, yylineno, yycolumn);
     }
     ;
 
@@ -448,8 +448,8 @@ tyfields
     : /* Empty */
     {
         printf("tyfields->Empty\n");
-	vector<NIdentifier*> *emptyList;
-	emptyList = (vector<NIdentifier*> *)malloc(sizeof(vector<NIdentifier*>));
+	    vector<NIdentifier*> *emptyList;
+	    emptyList = (vector<NIdentifier*> *)malloc(sizeof(vector<NIdentifier*>));
         $$ = emptyList;
     }
     | identifier
@@ -472,7 +472,7 @@ identifier
     : IDENTIFIER
     {
         printf("identifier->IDENTIFIER\n");
-        $$ = new NIdentifier(yylval.str_identifier);
+        $$ = new NIdentifier(yylval.str_identifier, yylineno, yycolumn);
     }
     ;
 
