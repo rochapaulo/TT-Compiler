@@ -97,8 +97,10 @@ class NBinaryOperation : public NExpression
         int op;
 
     public:
-        NBinaryOperation(NExpression *lExp, int op, NExpression *rExp)
+        NBinaryOperation(NExpression *lExp, int op, NExpression *rExp, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->rExp = rExp;
             this->lExp = lExp;
             this->op = op;
@@ -141,8 +143,10 @@ class NNegation : public NExpression
         NExpression *exp;
 
     public:
-        NNegation(NExpression *exp)
+        NNegation(NExpression *exp, int lin, int col)
         {
+            set_line(lin);
+            set_column(col);
             this->exp = exp;
         }
 

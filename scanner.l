@@ -1,17 +1,17 @@
 %{
-//    #include <string>
+    #include <string.h>
     #include "Node.h"
     #include "parser.h"
 
     using namespace std;    
 
     char * myStr;
-   
     int number;
+    int yycolumn = 0;
 
     void initString();
     void appendString(char *text);
-    //void printMessage(char *str);
+    void count();
 
 %}
 LETTER [a-zA-Z]
@@ -20,6 +20,7 @@ WHITESPACE [\t\ ]
 NEWLINE [\n\r]
 IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)* 
 %option noyywrap
+%option yylineno
 
 %x INCOMMENT
 %x INSTRING
@@ -27,73 +28,75 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 %%
 <INITIAL>
 {
-    "if"      	     return(IF);
-    "then"    	     return(THEN);
-    "else"     	     return(ELSE);
-    "for"      	     return(FOR);
-    "to"       	     return(TO);
-    "do"       	     return(DO);
-    "while"    	     return(WHILE);
-    "break"    	     return(BREAK);
-    "print"          return(PRINT);
-    "<>"       	     return(OPDIF);
-    ">="       	     return(OPGE);
-    "<="             return(OPLE);
-    "and"      	     return(AND);
-    "or"       	     return(OR);
-    "+"              return(PLUS);
-    "-"        	     return(MINUS);
-    "*"        	     return(MUL);
-    "/"        	     return(DIV);
-    "="        	     return(EQUAL);
-    ">"        	     return(OPG);
-    "<"       	     return(OPL);
-    "{"     	     return(LBRACE);
-    "}" 	         return(RBRACE);
-    "[" 	         return(LBRACKET);
-    "]"              return(RBRACKET);
-    "(" 	         return(LPAREN);
-    ")"  	         return(RPAREN);
-    ":="             return(ASSIGN);
-    ";"              return(SEMICOLON);
-    ":"              return(COMMA);
-    "."              return(DOT);
-    ","              return(COLON);
-    "function"       return(FUNCTION);
-    "import"         return(IMPORT);
+    "if"      	     { count(); return(IF);         }
+    "then"    	     { count(); return(THEN);       }
+    "else"     	     { count(); return(ELSE);       }
+    "for"      	     { count(); return(FOR);        }
+    "to"       	     { count(); return(TO);         }
+    "do"       	     { count(); return(DO);         }
+    "while"    	     { count(); return(WHILE);      }
+    "break"    	     { count(); return(BREAK);      }
+    "print"          { count(); return(PRINT);      }
+    "<>"       	     { count(); return(OPDIF);      }
+    ">="       	     { count(); return(OPGE);       }
+    "<="             { count(); return(OPLE);       }
+    "and"      	     { count(); return(AND);        }
+    "or"       	     { count(); return(OR);         }
+    "+"              { count(); return(PLUS);       }
+    "-"        	     { count(); return(MINUS);      }
+    "*"        	     { count(); return(MUL);        }
+    "/"        	     { count(); return(DIV);        }
+    "="        	     { count(); return(EQUAL);      }
+    ">"        	     { count(); return(OPG);        }
+    "<"       	     { count(); return(OPL);        }
+    "{"     	     { count(); return(LBRACE);     }
+    "}" 	         { count(); return(RBRACE);     }
+    "[" 	         { count(); return(LBRACKET);   }
+    "]"              { count(); return(RBRACKET);   }
+    "(" 	         { count(); return(LPAREN);     }
+    ")"  	         { count(); return(RPAREN);     }
+    ":="             { count(); return(ASSIGN);     }
+    ";"              { count(); return(SEMICOLON);  }
+    ":"              { count(); return(COMMA);      }
+    "."              { count(); return(DOT);        }
+    ","              { count(); return(COLON);      }
+    "function"       { count(); return(FUNCTION);   }
+    "import"         { count(); return(IMPORT);     }
     {IDENTIFIER}     { 
-			yylval.str_identifier = yytext;
-			return(IDENTIFIER); 
-		     }
+                       count();
+			           yylval.str_identifier = yytext;
+			           return(IDENTIFIER); 
+		             }
     ([+|-]?){DIGIT}+ { 
-    			yylval.integer = atoi(yytext); 
-			return(NUMBER); 
-		     }
-    {WHITESPACE}+   ;
-    {NEWLINE}+      ;
-    "/*" 	    BEGIN(INCOMMENT);
-    "\""	    initString();
-    . 		    yyterminate();
+    			       yylval.integer = atoi(yytext); 
+			           return(NUMBER); 
+		             }
+    {WHITESPACE}+    { count();                     }
+    {NEWLINE}+       { count();                     }
+    "/*" 	         { count(); BEGIN(INCOMMENT);   }
+    "\""	         { count(); initString();       }
+    . 		         { count(); yyterminate();      }
 }
 <INCOMMENT>
 {
-    "*/"        BEGIN(INITIAL);
-    "[^*\n]+"   ;
+    "*/"            { count(); BEGIN(INITIAL);      }
+    "[^*\n]+"       { count();                      }
 
 }
 <INSTRING>
 { 
    
-   "\\\"" { 
-   	      char *aux = (char *)malloc(sizeof(char));
-	      aux[0] = '\"';
-	      appendString(aux); 
-	  }
-   "\""   { 
-   	      yylval.str_value = myStr; 
-	      return(STRING);
-	  }
-   .      appendString(yytext);
+   "\\\""           { 
+                      count(); 
+   	                  char *aux = (char *)malloc(sizeof(char));
+	                  aux[0] = '\"';
+	                  appendString(aux); 
+	                }
+   "\""             { 
+   	                  yylval.str_value = myStr; 
+	                  return(STRING);
+	                }
+   .                { count(); appendString(yytext); }
 
 }
 
@@ -114,3 +117,13 @@ void appendString(char *text) {
     myStr = aux;
 }
 
+void count() {
+    for (int i = 0; i < yytext[i] != '\0'; i++) {
+        if (yytext[i] == '\n') {
+            yycolumn = 0;
+            yylineno++;
+        } else {
+            yycolumn++;
+        }
+    }
+}

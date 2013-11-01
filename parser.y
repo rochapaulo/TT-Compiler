@@ -1,14 +1,16 @@
 %{
 
 #include "Node.h"
+#include <cstdlib>
 extern int yylex();
 extern int yywrap();
-AST_Program* ast_program;
-
-void yyerror(const char *error) 
+extern int yylineno, yycolumn;
+void yyerror(string err) 
 { 
-    printf("ERROR: %s\n", error); 
+    printf("error on line %d, column %d\n",  yylineno, yycolumn); 
 }
+
+AST_Program* ast_program;
 %}
 
 %union {
@@ -16,14 +18,14 @@ void yyerror(const char *error)
     char             		*str_value;
     char                  	*str_identifier;
     int                 	integer;
-    int		        	op;
+    int	    	        	op;
     NExpression         	*exp;
     NStatement          	*dec;
-    NIdentifier             	*identifier;
-    NLValue                 	*leftValue;
+    NIdentifier            	*identifier;
+    NLValue                	*leftValue;
     vector<NExpression*>	*exps;
-    vector<NStatement*>     	*decs;
-    vector<NIdentifier*>    	*tyfields;
+    vector<NStatement*>    	*decs;
+    vector<NIdentifier*>   	*tyfields;
     NFunctionDec        	*fundec;
 }
 
@@ -150,7 +152,7 @@ binary_exp
     : term op term
     {
         printf("binary_exp->term op term\n");
-        $$ = new NBinaryOperation($1, $2, $3);
+        $$ = new NBinaryOperation($1, $2, $3, yylineno, yycolumn);
     }
     ;
 
@@ -229,7 +231,7 @@ neg_exp
     : MINUS exp
     {
         printf("neg_exp->MINUS exp\n");
-        $$ = new NNegation($2);
+        $$ = new NNegation($2, yylineno, yycolumn);
     }
     ;
 
