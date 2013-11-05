@@ -2,15 +2,18 @@
 
 #include "Node.h"
 #include <cstdlib>
+
 extern int yylex();
 extern int yywrap();
 extern int yylineno, yycolumn;
-void yyerror(char *msg) 
+
+void yyerror(const char *msg) 
 { 
     fprintf(stderr, "%s on line %d, column %d\n",  msg, yylineno, yycolumn); 
 }
 
 AST_Program* ast_program;
+
 %}
 
 %union {
@@ -78,19 +81,14 @@ AST_Program* ast_program;
 
 %%
 program
-    : decs exp
+    : decs exps
     {
         ast_program = new AST_Program($1, $2, yylineno, yycolumn);
     }
     ;
 
 exp
-    : term
-    {
-        printf("exp->term\n");
-        $$ = $1;
-    }
-    | binary_exp
+    : binary_exp
     {
         printf("exp->binary_exp\n");
         $$ = $1;
@@ -98,6 +96,11 @@ exp
     | neg_exp
     {
         printf("exp->neg_exp\n");
+        $$ = $1;
+    }
+    | term
+    {
+        printf("exp->term\n");
         $$ = $1;
     }
     | return_exp
@@ -351,35 +354,35 @@ funcall
     }
     ;
 
-exps
-    : exp
-    {
-        printf("exps->exp\n");
-    	vector<NExpression*> *expList;
-	    expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
-	    expList->push_back($1);
-    	$$ = expList;
-    }
-    | exps SEMICOLON exp
-    {
-        printf("exps->exps SEMICOLON exp\n");
-        $1->push_back($3);
-        $$ = $1;
-    }
-    ;
-
 args 
     : exp
     {
         printf("args->exp\n");
         vector<NExpression*> *expList;
-	    expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
+	expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
         expList->push_back($1);
         $$ = expList;
     }
     | args COLON exp
     {
         printf("args->args COLON exp\n");
+        $1->push_back($3);
+        $$ = $1;
+    }
+    ;
+
+exps
+    : exp
+    {
+        printf("exps->exp\n");
+    	vector<NExpression*> *expList;
+	expList = (vector<NExpression*> *)malloc(sizeof(vector<NExpression*>));
+	expList->push_back($1);
+    	$$ = expList;
+    }
+    | exps SEMICOLON exp
+    {
+        printf("exps->exps SEMICOLON exp\n");
         $1->push_back($3);
         $$ = $1;
     }

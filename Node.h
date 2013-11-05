@@ -60,30 +60,40 @@ class AST_Program : public Node
 {
     public:
         vector <NStatement*> *stmList;
-        NExpression *exp;
+        //NExpression *exp;
+	vector <NExpression*> *expList;
 
     public:
-        AST_Program(vector<NStatement*> *stmList, NExpression *exp, int lin, int col)
+        AST_Program(vector<NStatement*> *stmList, vector<NExpression*> *expList, int lin, int col)
         {
             set_line(lin);
             set_column(col);
             this->stmList = stmList;
-            this->exp = exp;
+            this->expList = expList;
         }
 
         virtual string to_string()
         {
             stringstream stream;
-            stream << "<AST_PROGRAM>\n";
+            
+	    stream << "<AST_PROGRAM>\n";
             if (stmList != NULL) {
                  stream << "<STATEMENTS_SECTION>\n"; 
 		 
 		 for (int i = 0; i < stmList->size(); i++)
 		    stream << stmList->at(i)->to_string();
-		    stream << "</STATEMENTS_SECTION>\n";
+		 
+		 stream << "</STATEMENTS_SECTION>\n";
             };
-            if (exp != NULL) {
-                stream << "<EXPRESSION_SECTION>\n" << exp->to_string() << "<EXPRESSION_SECTION>\n";
+            if (expList != NULL) {
+	        
+		stream << "<EXPRESSION_SECTION>\n";
+
+		for (int i = 0; i < expList->size(); i++)
+		    stream << expList->at(i)->to_string();
+
+                stream << "<EXPRESSION_SECTION>\n";
+
             };
             stream << "</AST_PROGRAM>\n";
             return (stream.str());

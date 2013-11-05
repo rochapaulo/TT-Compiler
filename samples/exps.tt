@@ -1,0 +1,22 @@
+import <teste>
+import <qualquercoisa>
+
+i := 1;
+teste := i;
+
+if teste = 1 then
+    (i := 5;
+     teste := qualquercoisa
+
+    )
+else 
+    teste := 9
+;
+
+while (i < teste) do
+    i := i + 1
+;
+
+for j := i+teste to 50 do
+    i := j
+

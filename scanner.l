@@ -7,7 +7,7 @@
     int number;
     int yycolumn = 0;
 
-    extern void yyerror(char *);
+    extern void yyerror(const char *);
     void initString();
     void appendString(char *);
     void count();
@@ -74,7 +74,7 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     {NEWLINE}+		{ count();                     }
     "/*"		{ count(); BEGIN(INCOMMENT);   }
     "\""		{ count(); initString();       }
-    .			{ yyerror("Unknown character");}
+    .			{ yyerror((char*)"Unknown character");}
 }
 <INCOMMENT>
 {
@@ -86,16 +86,19 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
 { 
    
    "\\\""		{ 
-	    		 count(); 
-    			 char *aux = (char *)malloc(sizeof(char));
-			 aux[0] = '\"';
-			 appendString(aux); 
+	    		  count(); 
+    			  char *aux = (char *)malloc(sizeof(char));
+			  aux[0] = '\"';
+			  appendString(aux); 
 	            	}
    "\""			{ 
-		    	 yylval.str_value = myStr; 
-			 return(STRING);
+		    	  yylval.str_value = myStr; 
+			  return(STRING);
 			}
-   .			{ count(); appendString(yytext);}
+   .			{ 
+   			  count(); 
+			  appendString(yytext);
+			}
 }
 
 %%
