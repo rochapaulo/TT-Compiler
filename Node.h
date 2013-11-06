@@ -1,6 +1,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include "TreeAnalyzer.h"
 
 using namespace std;
 
@@ -36,6 +37,7 @@ class Node
         }
 
         virtual string to_string() = 0;
+        virtual void analyze(TreeAnalyzer *analyzer) = 0;
 
         void set_line(int lin)
         {
@@ -60,8 +62,7 @@ class AST_Program : public Node
 {
     public:
         vector <NStatement*> *stmList;
-        //NExpression *exp;
-	vector <NExpression*> *expList;
+		vector <NExpression*> *expList;
 
     public:
         AST_Program(vector<NStatement*> *stmList, vector<NExpression*> *expList, int lin, int col)
@@ -98,6 +99,20 @@ class AST_Program : public Node
             stream << "</AST_PROGRAM>\n";
             return (stream.str());
         }
+        
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	if (stmList != NULL)
+				for (int i = 0; i < stmList->size(); i++)
+			    	stmList->at(i)->analyze(analyzer);
+		 
+			if (expList != NULL)
+				for (int i = 0; i < expList->size(); i++)
+			    	expList->at(i)->analyze(analyzer);
+        	
+        }
 };
 
 class NBinaryOperation : public NExpression
@@ -127,6 +142,15 @@ class NBinaryOperation : public NExpression
                 << "</BINARY_OPERATION>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	rExp->analyze(analyzer);
+        	lExp->analyze(analyzer);
+        }
+      
 };
 
 class NInteger : public NExpression
@@ -147,6 +171,11 @@ class NInteger : public NExpression
             stringstream stream;
             stream << "<INTEGER>\n" << value << "\n</INTEGER>\n";
             return stream.str();
+        }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
         }
 };
 
@@ -169,6 +198,14 @@ class NNegation : public NExpression
             stream << "<NEGATION>\n" + exp->to_string() + "</NEGATION>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	exp->analyze(analyzer);
+        }
+
 };
 
 class NReturn : public NExpression
@@ -190,6 +227,14 @@ class NReturn : public NExpression
             stream << "<RETURN>\n" << exp->to_string() << "</RETURN>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	exp->analyze(analyzer);
+        }
+
 };
 
 class NIdentifier : public NExpression
@@ -211,6 +256,12 @@ class NIdentifier : public NExpression
             stream << "<IDENTIFIER>\n" << identifier << "\n</IDENTIFIER>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);        	
+        }
+
 };
 
 class NLValue : public NExpression
@@ -235,11 +286,24 @@ class NLValue : public NExpression
 
 	    if (indexList != NULL){
 	        for (int i = 0; i < indexList->size(); i++)
-		    stream << "<INDEX>\n" << indexList->at(i)->to_string() << "</INDEX>\n";
+		    	stream << "<INDEX>\n" << indexList->at(i)->to_string() << "</INDEX>\n";
 	    }
 
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	identifier->analyze(analyzer);
+        	
+		    if (indexList != NULL)
+		        for (int i = 0; i < indexList->size(); i++)
+			    	indexList->at(i)->analyze(analyzer);
+        	
+        }
+
 };
 
 class NAssign : public NExpression
@@ -266,6 +330,16 @@ class NAssign : public NExpression
 		   << "</ASSIGN>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	lvalue->analyze(analyzer);
+        	
+        	exp->analyze(analyzer);
+        }
+
 };
 
 class NIf : public NExpression
@@ -296,6 +370,16 @@ class NIf : public NExpression
             stream << "</IF>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	cond->analyze(analyzer);
+        	trueExp->analyze(analyzer);
+        	falseExp->analyze(analyzer);
+        }
+
 };
 
 class NWhile : public NExpression
@@ -321,6 +405,15 @@ class NWhile : public NExpression
                 << "</WHILE>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	cond->analyze(analyzer);
+        	body->analyze(analyzer);
+        }
+
 };
 
 class NFor : public NExpression
@@ -352,6 +445,17 @@ class NFor : public NExpression
                 << "</FOR>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	identifier->analyze(analyzer);
+        	initExp->analyze(analyzer);
+        	endExp->analyze(analyzer);
+        	body->analyze(analyzer);
+        }
+
 };
 
 class NBreak : public NExpression
@@ -369,6 +473,12 @@ class NBreak : public NExpression
             stream << "<BREAK>\n" << "</BREAK>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        }
+
 };
 
 class NArrayCreation : public NExpression
@@ -397,6 +507,14 @@ class NArrayCreation : public NExpression
                 << "</ARRAY_CREATION>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	identifier->analyze(analyzer);
+        }
+
 };
 
 
@@ -419,13 +537,26 @@ class NFunctionCall : public NExpression
         {
             stringstream stream;
             stream << "<FUNCTION_CALL>\n"<< identifier->to_string();
-            for (int i = 0; i < args->size(); i++)
-            {
-                stream << (args->at(i))->to_string();
-            }
+			
+			if (args != NULL)
+	            for (int i = 0; i < args->size(); i++)
+   		            stream << (args->at(i))->to_string();
+            
             stream << "</FUNCTION_CALL>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	identifier->analyze(analyzer);
+
+			if (args != NULL)
+	            for (int i = 0; i < args->size(); i++)
+   		            args->at(i)->analyze(analyzer);
+        }
+
 };
 
 class NExpressionList : public NExpression
@@ -445,13 +576,23 @@ class NExpressionList : public NExpression
         {
             stringstream stream;
             stream << "<EXPRESSION_LIST>\n";
+
             for (int i = 0; i < expList->size(); i++) 
-            {
-                stream << (expList->at(i))->to_string();
-            }
+                stream << expList->at(i)->to_string();
+            
             stream << "</EXPRESSION_LIST>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	for (int i = 0; i < expList->size(); i++) 
+                expList->at(i)->analyze(analyzer);
+
+        }
+
 };
 
 
@@ -481,14 +622,29 @@ class NFunctionDec : public NStatement
             stringstream stream;
             stream << "<FUNCTION_DEC>\n" << identifier->to_string() 
                    <<"<ARGS>\n";
-            for(int i = 0; i < args->size(); i++)
-                stream << (args->at(i))->to_string();
+            
+            if (args != NULL)
+	            for(int i = 0; i < args->size(); i++)
+    	            stream << args->at(i)->to_string();
          
             stream << "</ARGS>\n"
                    << "<BODY>\n" << exp->to_string() << "</body>\n"
                    << "</FUNCTION_DEC>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	identifier->analyze(analyzer);
+        	
+            if (args != NULL)
+	            for(int i = 0; i < args->size(); i++)
+    	            args->at(i)->analyze(analyzer);
+        	
+        }
+
 };
 
 class NImport : public NStatement
@@ -510,4 +666,12 @@ class NImport : public NStatement
             stream << "<IMPORT>\n" << identifier->to_string() << "</IMPORT>\n";
             return stream.str();
         }
+
+        virtual void analyze(TreeAnalyzer *analyzer)
+        {
+        	analyzer->visit(this);
+        	
+        	identifier->analyze(analyzer);
+        }
+
 };

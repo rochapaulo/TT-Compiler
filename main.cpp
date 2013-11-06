@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include "Node.h"
 
-
 using namespace std;
 
 extern AST_Program * ast_program;
