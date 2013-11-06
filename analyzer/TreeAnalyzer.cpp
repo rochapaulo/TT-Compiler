@@ -1,67 +1,71 @@
-#include "TreeAnalyzer.h"
+#include "../Node.h"
 
-
-virtual void TreeAnalyzer::visit(AST_Program *program)
-{
+void TreeAnalyzer::visit(AST_Program *program) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NBinaryOperation *exp)
-{
+void TreeAnalyzer::visit(NBinaryOperation *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NNegation *exp)
-{
+void TreeAnalyzer::visit(NNegation *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NReturn *exp)
-{
+void TreeAnalyzer::visit(NReturn *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NIdentifier *exp)
-{
+void TreeAnalyzer::visit(NIdentifier *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NAssign *exp)
-{
+void TreeAnalyzer::visit(NAssign *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NIf *exp)
-{
+void TreeAnalyzer::visit(NIf *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NWhile * exp)
-{
+void TreeAnalyzer::visit(NWhile *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NFor *exp)
-{
+void TreeAnalyzer::visit(NFor *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NBreak *exp)
-{
+void TreeAnalyzer::visit(NBreak *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NLValue *exp)
-{
+void TreeAnalyzer::visit(NLValue *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NArrayCreation *exp)
-{
+void TreeAnalyzer::visit(NArrayCreation *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NFunCall *exp)
-{
+void TreeAnalyzer::visit(NFunctionCall *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NInteger *exp)
-{
+void TreeAnalyzer::visit(NExpressionList *exp){
+
 }
 
-virtual void TreeAnalyzer::visit(NFunctionDec *dec)
-{
+void TreeAnalyzer::visit(NInteger *exp) {
+    
 }
 
-virtual void TreeAnalyzer::visit(NImport *dec)
-{
+void TreeAnalyzer::visit(NFunctionDec *dec) {
+    
 }
+
+void TreeAnalyzer::visit(NImport *dec) {
+    
+}
+
 

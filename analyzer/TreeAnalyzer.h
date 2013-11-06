@@ -1,9 +1,4 @@
-#ifdef TREE_ANALYZER_H
-#define TREE_ANALYZER_H
 
-class Node;
-class NExpression;
-class NStatement;
 class AST_Program;
 class NBinaryOperation;
 class NNegation;
@@ -16,7 +11,8 @@ class NFor;
 class NBreak;
 class NLValue;
 class NArrayCreation;
-class NFunCall;
+class NFunctionCall;
+class NExpressionList;
 class NInteger;
 class NFunctionDec;
 class NImport;
@@ -37,9 +33,10 @@ class TreeAnalyzer {
        virtual void visit(NBreak *exp) = 0;
        virtual void visit(NLValue *exp) = 0;
        virtual void visit(NArrayCreation *exp) = 0;
-       virtual void visit(NFunCall *exp) = 0;
+       virtual void visit(NFunctionCall *exp) = 0;
+       virtual void visit(NExpressionList *exp) = 0;
        virtual void visit(NInteger *exp) = 0;
        virtual void visit(NFunctionDec *dec) = 0;
        virtual void visit(NImport *dec) = 0;
 };
-#endif
+

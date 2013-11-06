@@ -1,7 +1,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include "TreeAnalyzer.h"
+#include "./analyzer/TreeAnalyzer.h"
 
 using namespace std;
 
@@ -20,7 +20,8 @@ class NFor;
 class NBreak;
 class NLValue;
 class NArrayCreation;
-class NFunCall;
+class NFunctionCall;
+class NExpressionList;
 class NInteger;
 class NFunctionDec;
 class NImport;
@@ -589,7 +590,7 @@ class NExpressionList : public NExpression
         	analyzer->visit(this);
         	
         	for (int i = 0; i < expList->size(); i++) 
-                expList->at(i)->analyze(analyzer);
+                    expList->at(i)->analyze(analyzer);
 
         }
 
