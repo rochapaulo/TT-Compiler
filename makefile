@@ -2,6 +2,7 @@ CC = c++
 BISON = bison
 FLEX = flex
 EXEC = parser
+PATHS = -I./analyzer -I./
 
 all: $(EXEC) clean
 
@@ -13,7 +14,7 @@ lex.yy.c: scanner.l
 	@$(FLEX) scanner.l
 
 parser: parser.cpp lex.yy.c
-	@$(CC) -o parser parser.cpp lex.yy.c ./analyzer/TreeAnalyzer.cpp main.cpp -ll
+	@$(CC) -o parser parser.cpp lex.yy.c ./analyzer/TreeAnalyzer.cpp main.cpp -ll $(PATHS)
 
 install: all
 	@mkdir -p build

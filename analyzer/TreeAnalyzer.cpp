@@ -1,4 +1,4 @@
-#include "../Node.h"
+#include "Node.h"
 
 void TreeAnalyzer::visit(AST_Program *program) {
     

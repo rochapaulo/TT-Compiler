@@ -1,7 +1,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include "./analyzer/TreeAnalyzer.h"
+#include "TreeAnalyzer.h"
 
 using namespace std;
 
