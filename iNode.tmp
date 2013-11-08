@@ -1,0 +1,85 @@
+#include "TreeAnalyzer.h"
+
+class Node
+{
+    public:
+        int lin;
+        int col;
+
+    public:
+        virtual ~Node();
+        virtual string toString();
+        virtual void analyze(TreeAnalyzer *analyzer);
+        void setLine(int lin);
+        void setColumn();
+};
+
+class NExpression : public Node { };
+
+class NStatement : public Node { };
+
+class AST_Program : public Node
+{
+    public:
+        vector <NStatement*> *stmList;
+        vector <NExpression*> *expList;
+   
+    public:
+        AST_Program(vector<NStatement*> *stmList, vector <NExpression*> *expList, int lin, int col);
+};
+
+class NBinaryOperation : public NExpression
+{
+    public:
+        NExpression *rExp;
+        NExpression *lExp;
+        int op;
+    
+    NBinaryOperation(NExpression *lExp, int op, NExpression *rExp, int lin, int col);
+};
+
+class NInteger : public NExpression
+{
+    public:
+        int value;
+
+    public:
+        NInteger(int value, int lin, int col);
+};
+
+class NNegation : public NExpression
+{
+    public:
+        NExpression *exp;
+
+    public:
+        NNegation(NExpression *exp, int lin, int col);
+};
+
+class NReturn : public NExpression
+{
+    public:
+        NExpression *exp;
+
+    public:
+        NReturn(NExpression *exp, int lin, int col);
+};
+
+class NIdentifier : public NExpression
+{
+    public:
+        string identifier;
+
+    public:
+        NIdentifier(char *identifier, int lin, int col);
+};
+
+class NLValue : public NExpression 
+{
+    public:
+        NIdentifier *identifier;
+        vector <NExpression*> *indexList;
+
+    public:
+        NLValue(NIdentifier *identifier, vector<NExpression*> *indexList, int lin, int col);
+};
