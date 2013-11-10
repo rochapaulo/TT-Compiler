@@ -1,7 +1,10 @@
+#include <iostream>
 #include "Node.h"
 
+using namespace std;
+
 void TreeAnalyzer::visit(AST_Program *program) {
-    
+   cout << "AST_Program analyze" << endl; 
 }
 
 void TreeAnalyzer::visit(NBinaryOperation *exp) {

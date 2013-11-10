@@ -1,3 +1,5 @@
+#ifndef TreeAnalyzer_H
+#define TreeAnalyzer_H
 
 class AST_Program;
 class NBinaryOperation;
@@ -20,23 +22,25 @@ class NImport;
 class TreeAnalyzer {
    
    public:
-       virtual ~TreeAnalyzer() {}
-       virtual void visit(AST_Program *program) = 0;
-       virtual void visit(NBinaryOperation *exp) = 0;
-       virtual void visit(NNegation *exp) = 0;
-       virtual void visit(NReturn *exp) = 0;
-       virtual void visit(NIdentifier *exp) = 0;
-       virtual void visit(NAssign *exp) = 0;
-       virtual void visit(NIf *exp) = 0;
-       virtual void visit(NWhile * exp) = 0;
-       virtual void visit(NFor *exp) = 0;
-       virtual void visit(NBreak *exp) = 0;
-       virtual void visit(NLValue *exp) = 0;
-       virtual void visit(NArrayCreation *exp) = 0;
-       virtual void visit(NFunctionCall *exp) = 0;
-       virtual void visit(NExpressionList *exp) = 0;
-       virtual void visit(NInteger *exp) = 0;
-       virtual void visit(NFunctionDec *dec) = 0;
-       virtual void visit(NImport *dec) = 0;
+       TreeAnalyzer() {}
+       void visit(AST_Program *program);
+       void visit(NBinaryOperation *exp);
+       void visit(NNegation *exp);
+       void visit(NReturn *exp);
+       void visit(NIdentifier *exp);
+       void visit(NAssign *exp);
+       void visit(NIf *exp);
+       void visit(NWhile * exp);
+       void visit(NFor *exp);
+       void visit(NBreak *exp);
+       void visit(NLValue *exp);
+       void visit(NArrayCreation *exp);
+       void visit(NFunctionCall *exp);
+       void visit(NExpressionList *exp);
+       void visit(NInteger *exp);
+       void visit(NFunctionDec *dec);
+       void visit(NImport *dec);
 };
+
+#endif
 

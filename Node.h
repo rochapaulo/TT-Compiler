@@ -3,8 +3,7 @@
 #include <sstream>
 #include "TreeAnalyzer.h"
 
-using namespace std;
-
+//class TreeAnalyzer;
 class Node;
 class NExpression;
 class NStatement;
@@ -26,574 +25,212 @@ class NInteger;
 class NFunctionDec;
 class NImport;
 
+using namespace std;
+
 class Node
 {
-    public:
+    private:
         int lin;
         int col;
 
     public:
-        virtual ~Node()
-        {
-        }
+        virtual ~Node() { }
 
         virtual string to_string() = 0;
         virtual void analyze(TreeAnalyzer *analyzer) = 0;
 
-        void set_line(int lin)
-        {
-            this->lin = lin;
-        }
-
-        void set_column(int col)
-        {
-            this->col = col;
-        }
+        void set_line(int lin);
+        void set_column(int col);
 };
 
-class NExpression : public Node
-{
-};
+class NExpression : public Node { };
 
-class NStatement : public Node
-{
-};
+class NStatement : public Node { };
 
 class AST_Program : public Node
 {
-    public:
+    private:
         vector <NStatement*> *stmList;
-		vector <NExpression*> *expList;
+	vector <NExpression*> *expList;
 
     public:
-        AST_Program(vector<NStatement*> *stmList, vector<NExpression*> *expList, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->stmList = stmList;
-            this->expList = expList;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            
-	    stream << "<AST_PROGRAM>\n";
-            if (stmList != NULL) {
-                 stream << "<STATEMENTS_SECTION>\n"; 
-		 
-		 for (int i = 0; i < stmList->size(); i++)
-		    stream << stmList->at(i)->to_string();
-		 
-		 stream << "</STATEMENTS_SECTION>\n";
-            };
-            if (expList != NULL) {
-	        
-		stream << "<EXPRESSION_SECTION>\n";
-
-		for (int i = 0; i < expList->size(); i++)
-		    stream << expList->at(i)->to_string();
-
-                stream << "<EXPRESSION_SECTION>\n";
-
-            };
-            stream << "</AST_PROGRAM>\n";
-            return (stream.str());
-        }
-        
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	if (stmList != NULL)
-				for (int i = 0; i < stmList->size(); i++)
-			    	stmList->at(i)->analyze(analyzer);
-		 
-			if (expList != NULL)
-				for (int i = 0; i < expList->size(); i++)
-			    	expList->at(i)->analyze(analyzer);
-        	
-        }
+        AST_Program(vector<NStatement*> *stmList, vector<NExpression*> *expList, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 };
 
 class NBinaryOperation : public NExpression
 {
-    public:
+    private:
         NExpression *rExp;
         NExpression *lExp;
         int op;
 
     public:
-        NBinaryOperation(NExpression *lExp, int op, NExpression *rExp, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->rExp = rExp;
-            this->lExp = lExp;
-            this->op = op;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<BINARY_OPERATION>\n" 
-                << "<LEFT_EXPRESSION>\n"  << lExp->to_string() << "</LEFT_EXPRESSION>\n"
-                << "<OPERATION>\n" << op << "\n</OPERATION>\n"
-                << "<RIGHT_EXPRESSION>\n" << rExp->to_string() << "</RIGHT_EXPRESSION>\n"
-                << "</BINARY_OPERATION>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	rExp->analyze(analyzer);
-        	lExp->analyze(analyzer);
-        }
-      
+        NBinaryOperation(NExpression *lExp, int op, NExpression *rExp, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 };
 
 class NInteger : public NExpression
 {
-    public:
+    private:
         int value;
 
     public:
-        NInteger(int value, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->value = value;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<INTEGER>\n" << value << "\n</INTEGER>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        }
+        NInteger(int value, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 };
 
 class NNegation : public NExpression
 {
-    public:
+    private:
         NExpression *exp;
 
     public:
-        NNegation(NExpression *exp, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->exp = exp;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<NEGATION>\n" + exp->to_string() + "</NEGATION>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	exp->analyze(analyzer);
-        }
-
+        NNegation(NExpression *exp, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 };
 
 class NReturn : public NExpression
 {
-    public:
+    private:
         NExpression *exp;
 
     public:
-        NReturn(NExpression *exp, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->exp = exp;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<RETURN>\n" << exp->to_string() << "</RETURN>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	exp->analyze(analyzer);
-        }
-
+        NReturn(NExpression *exp, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 };
 
 class NIdentifier : public NExpression
 {
-    public:
+    private:
         string identifier;
 
     public:
-        NIdentifier(char *identifier, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-	        this->identifier = identifier;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<IDENTIFIER>\n" << identifier << "\n</IDENTIFIER>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);        	
-        }
-
+        NIdentifier(char *identifier, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
+    
 };
 
 class NLValue : public NExpression
 {
-    public:
+    private:
         NIdentifier *identifier;
         vector <NExpression*> *indexList;
 
     public:
-        NLValue(NIdentifier *identifier, vector <NExpression*> *indexList, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->identifier = identifier; 
-            this->indexList = indexList;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<LVALUE>\n" << identifier->to_string() << "</LVALUE>\n";
-
-	    if (indexList != NULL){
-	        for (int i = 0; i < indexList->size(); i++)
-		    	stream << "<INDEX>\n" << indexList->at(i)->to_string() << "</INDEX>\n";
-	    }
-
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	identifier->analyze(analyzer);
-        	
-		    if (indexList != NULL)
-		        for (int i = 0; i < indexList->size(); i++)
-			    	indexList->at(i)->analyze(analyzer);
-        	
-        }
+        NLValue(NIdentifier *identifier, vector <NExpression*> *indexList, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 
 };
 
 class NAssign : public NExpression
 {
-    public:
+    private:
         NLValue *lvalue;
         NExpression *exp;
 
     public:
-        NAssign(NLValue *lvalue, NExpression *exp, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->lvalue = lvalue;
-            this->exp = exp;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<ASSIGN>\n" 
-	    	   << "<LEFT_EXPRESSION>\n" << lvalue->to_string() << "</LEFT_EXPRESSION>\n"
-		   << "<RIGHT_EXPRESSION>\n" << exp->to_string() << "</RIGHT_EXPRESSION>\n"
-		   << "</ASSIGN>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	lvalue->analyze(analyzer);
-        	
-        	exp->analyze(analyzer);
-        }
+        NAssign(NLValue *lvalue, NExpression *exp, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 
 };
 
 class NIf : public NExpression
 {
-    public:
+    private:
         NExpression *cond;
         NExpression *trueExp;
         NExpression *falseExp;
 
     public:
-        NIf(NExpression *cond, NExpression *trueExp, NExpression *falseExp, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->cond = cond;
-            this->trueExp = trueExp;
-            this->falseExp = falseExp;
-        }
-
-        virtual string to_string()
-        {   
-            stringstream stream;
-            stream << "<IF>\n" << cond->to_string()
-                << "<THEN>\n" << trueExp->to_string() << "</THEN>\n";
-            if (falseExp != NULL) {
-                stream << "<ELSE>\n" << falseExp->to_string() << "</ELSE>\n";
-            }
-            stream << "</IF>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	cond->analyze(analyzer);
-        	trueExp->analyze(analyzer);
-        	falseExp->analyze(analyzer);
-        }
+        NIf(NExpression *cond, NExpression *trueExp, NExpression *falseExp, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 
 };
 
 class NWhile : public NExpression
 {
-    public:
+    private:
         NExpression *cond;
         NExpression *body;
 
     public:
-        NWhile(NExpression *cond, NExpression *body, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->cond = cond;
-            this->body = body;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<WHILE>\n" << cond->to_string() 
-                << "<DO>\n" << body->to_string() << "</DO>\n"
-                << "</WHILE>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	cond->analyze(analyzer);
-        	body->analyze(analyzer);
-        }
+        NWhile(NExpression *cond, NExpression *body, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 
 };
 
 class NFor : public NExpression
 {
-    public:
+    private:
         NIdentifier *identifier;
         NExpression *initExp;
         NExpression *endExp;
         NExpression *body;        
 
     public:
-        NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->identifier = identifier;
-            this->initExp = initExp;
-            this->endExp = endExp;
-            this->body = body;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<FOR>\n" << identifier->to_string()
-                << "<ASSIGN>\n" << initExp->to_string() << "</ASSIGN>\n"
-                << "<TO>\n" << endExp->to_string() << "</TO>\n"
-                << "<DO>\n" << body->to_string() << "</DO>\n"
-                << "</FOR>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	identifier->analyze(analyzer);
-        	initExp->analyze(analyzer);
-        	endExp->analyze(analyzer);
-        	body->analyze(analyzer);
-        }
+        NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 
 };
 
 class NBreak : public NExpression
 {
     public:
-        NBreak(int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<BREAK>\n" << "</BREAK>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        }
-
+        NBreak(int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
+    
 };
 
 class NArrayCreation : public NExpression
 {
-    public:
+    private:
         NIdentifier *identifier;
         int dimension;
 
     public:
-        NArrayCreation(NIdentifier *identifier, int dimension, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->identifier = identifier;
-            this->dimension = dimension;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<ARRAY_CREATION>\n"
-                << identifier->to_string()
-                << "<DIMENSIONS>\n" 
-		        << dimension 
-		        << "\n</DIMENSIONS>\n"
-                << "</ARRAY_CREATION>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	identifier->analyze(analyzer);
-        }
+        NArrayCreation(NIdentifier *identifier, int dimension, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
 
 };
 
 
 class NFunctionCall : public NExpression
 {
-    public:
+    private:
         NIdentifier *identifier;
         vector <NExpression*> *args;
 
     public:
-        NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->identifier = identifier;
-            this->args = args;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<FUNCTION_CALL>\n"<< identifier->to_string();
-			
-			if (args != NULL)
-	            for (int i = 0; i < args->size(); i++)
-   		            stream << (args->at(i))->to_string();
-            
-            stream << "</FUNCTION_CALL>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	identifier->analyze(analyzer);
-
-			if (args != NULL)
-	            for (int i = 0; i < args->size(); i++)
-   		            args->at(i)->analyze(analyzer);
-        }
+    NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args, int lin, int col);
+    virtual string to_string();
+    virtual void analyze(TreeAnalyzer *analyzer);
 
 };
 
 class NExpressionList : public NExpression
 {
-    public:
+    private:
         vector<NExpression*> *expList;
 
     public:
-        NExpressionList(vector<NExpression*> *expList, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->expList = expList;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<EXPRESSION_LIST>\n";
-
-            for (int i = 0; i < expList->size(); i++) 
-                stream << expList->at(i)->to_string();
-            
-            stream << "</EXPRESSION_LIST>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	for (int i = 0; i < expList->size(); i++) 
-                    expList->at(i)->analyze(analyzer);
-
-        }
-
+    NExpressionList(vector<NExpression*> *expList, int lin, int col);
+    virtual string to_string();
+    virtual void analyze(TreeAnalyzer *analyzer);
+    
 };
 
 
@@ -603,76 +240,27 @@ class NExpressionList : public NExpression
 
 class NFunctionDec : public NStatement
 {
-    public:
+    private:
         NIdentifier *identifier;
         vector<NIdentifier*> *args;
         NExpression *exp;
 
     public:
-        NFunctionDec(NIdentifier *identifier, vector<NIdentifier*> *args, NExpression *exp, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->identifier = identifier;
-            this->args = args;
-            this->exp = exp;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<FUNCTION_DEC>\n" << identifier->to_string() 
-                   <<"<ARGS>\n";
-            
-            if (args != NULL)
-	            for(int i = 0; i < args->size(); i++)
-    	            stream << args->at(i)->to_string();
-         
-            stream << "</ARGS>\n"
-                   << "<BODY>\n" << exp->to_string() << "</body>\n"
-                   << "</FUNCTION_DEC>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	identifier->analyze(analyzer);
-        	
-            if (args != NULL)
-	            for(int i = 0; i < args->size(); i++)
-    	            args->at(i)->analyze(analyzer);
-        	
-        }
-
+        NFunctionDec(NIdentifier *identifier, vector<NIdentifier*> *args, NExpression *exp, int lin, int col);
+        virtual string to_string();
+        virtual void analyze(TreeAnalyzer *analyzer);
+    
 };
 
 class NImport : public NStatement
 {
-    public:
+    private:
         NIdentifier *identifier;
 
     public:
-        NImport(NIdentifier *identifier, int lin, int col)
-        {
-            set_line(lin);
-            set_column(col);
-            this->identifier = identifier;
-        }
-
-        virtual string to_string()
-        {
-            stringstream stream;
-            stream << "<IMPORT>\n" << identifier->to_string() << "</IMPORT>\n";
-            return stream.str();
-        }
-
-        virtual void analyze(TreeAnalyzer *analyzer)
-        {
-        	analyzer->visit(this);
-        	
-        	identifier->analyze(analyzer);
-        }
-
+    NImport(NIdentifier *identifier, int lin, int col);
+    virtual string to_string();
+    virtual void analyze(TreeAnalyzer *analyzer);
+    
 };
+
