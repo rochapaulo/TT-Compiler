@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
         cout << "Parse complete." << endl;
         
 	ofstream outfile(argv[2]);
-        outfile << ast_program->to_string();
+        outfile << ast_program->toString();
    }
 
     cout << "Analyzing Semantics ..." << endl; 

@@ -3,36 +3,38 @@
 
 using namespace std;
 
-void TreeAnalyzer::visit(AST_Program *program) {
-   cout << "AST_Program analyze" << endl; 
+void TreeAnalyzer::visit(AST_Program *program) 
+{
+   cout << "Analyzing AST_Program" << endl; 
 }
 
-void TreeAnalyzer::visit(NBinaryOperation *exp) {
-    
+void TreeAnalyzer::visit(NBinaryOperation *exp) 
+{
+    cout << "Analyzing NBinaryOperation" << endl;
 }
 
 void TreeAnalyzer::visit(NNegation *exp) {
-    
+
 }
 
 void TreeAnalyzer::visit(NReturn *exp) {
-    
+
 }
 
 void TreeAnalyzer::visit(NIdentifier *exp) {
-    
+
 }
 
 void TreeAnalyzer::visit(NAssign *exp) {
-    
+
 }
 
 void TreeAnalyzer::visit(NIf *exp) {
-    
+
 }
 
 void TreeAnalyzer::visit(NWhile *exp) {
-    
+
 }
 
 void TreeAnalyzer::visit(NFor *exp) {
@@ -70,5 +72,3 @@ void TreeAnalyzer::visit(NFunctionDec *dec) {
 void TreeAnalyzer::visit(NImport *dec) {
     
 }
-
-
