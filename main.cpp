@@ -11,6 +11,7 @@ using namespace std;
 extern AST_Program * ast_program;
 extern FILE *yyin, *yyout;
 extern int yyparse();
+TreeAnalyzer *analyzer;
 
 string getOperation(int);
 
@@ -44,11 +45,11 @@ int main(int argc, char *argv[]) {
 
     cout << "Analyzing Semantics ..." << endl; 
 
-    TreeAnalyzer analyzer = TreeAnalyzer();
+    analyzer = new TreeAnalyzer();
 
-    cout << "teste" << endl;
+    ast_program->analyze(analyzer);
 
-    ast_program->analyze(&analyzer);
+    cout << "Analyze complete." << endl;
 
     fclose(p_infile);
     fclose(p_outfile);

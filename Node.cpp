@@ -224,7 +224,8 @@ void NIf::analyze(TreeAnalyzer *analyzer){
 
     cond->analyze(analyzer);
     trueExp->analyze(analyzer);
-    falseExp->analyze(analyzer);
+    if (falseExp != NULL)
+        falseExp->analyze(analyzer);
 }
 
 NWhile::NWhile(NExpression *cond, NExpression *body, int lin, int col){
