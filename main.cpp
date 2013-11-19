@@ -39,17 +39,16 @@ int main(int argc, char *argv[]) {
     if (yyparse() == 0)	{
         cout << "Parse complete." << endl;
         
-	ofstream outfile(argv[2]);
+		ofstream outfile(argv[2]);
         outfile << ast_program->toString();
+        
+        cout << "Analyzing Semantics ..." << endl; 
+	    analyzer = new TreeAnalyzer();	
+	    ast_program->analyze(analyzer);
+	
+	    cout << "Analyze complete." << endl;
+
    }
-
-    cout << "Analyzing Semantics ..." << endl; 
-
-    analyzer = new TreeAnalyzer();
-
-    ast_program->analyze(analyzer);
-
-    cout << "Analyze complete." << endl;
 
     fclose(p_infile);
     fclose(p_outfile);

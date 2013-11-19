@@ -35,6 +35,7 @@ IDENTIFIER ({LETTER}|_)({LETTER}|{DIGIT}|_)*
     "do"		{ count(); return(DO);         }
     "while"		{ count(); return(WHILE);      }
     "break"		{ count(); return(BREAK);      }
+    "return"		{ count(); return(RETURN);     }
     "print"		{ count(); return(PRINT);      }
     "<>"		{ count(); return(OPDIF);      }
     ">="		{ count(); return(OPGE);       }

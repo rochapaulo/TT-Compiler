@@ -147,7 +147,7 @@ binary_exp
     ;
 
 term 
-    : leftValue
+    : identifier
     {
         $$ = $1;
     }

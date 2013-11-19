@@ -1,6 +1,13 @@
+
 #ifndef TreeAnalyzer_H
 #define TreeAnalyzer_H
 
+#include <map>
+#include <string>
+
+using namespace std;
+
+class Node;
 class AST_Program;
 class NBinaryOperation;
 class NNegation;
@@ -19,10 +26,17 @@ class NInteger;
 class NFunctionDec;
 class NImport;
 
+typedef map<string, Node*> SymbolTable;
+
 class TreeAnalyzer {
    
+   private:
+       SymbolTable *firstScope;
+       SymbolTable *secondScope;
+       void printError(string msg, int lin, int col);
+              
    public:
-       TreeAnalyzer() {}
+       TreeAnalyzer();
        void visit(AST_Program *program);
        void visit(NBinaryOperation *exp);
        void visit(NNegation *exp);
@@ -40,7 +54,10 @@ class TreeAnalyzer {
        void visit(NInteger *exp);
        void visit(NFunctionDec *dec);
        void visit(NImport *dec);
+       
+       void eraseScope();       
 };
+
 
 #endif
 

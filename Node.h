@@ -28,7 +28,7 @@ using namespace std;
 
 class Node
 {
-    private:
+    public:
         int lin;
         int col;
 
@@ -48,9 +48,9 @@ class NStatement : public Node { };
 
 class AST_Program : public Node
 {
-    private:
+    public:
         vector <NStatement*> *stmList;
-	vector <NExpression*> *expList;
+		vector <NExpression*> *expList;
 
     public:
         AST_Program(vector<NStatement*> *stmList, vector<NExpression*> *expList, int lin, int col);
@@ -60,7 +60,7 @@ class AST_Program : public Node
 
 class NBinaryOperation : public NExpression
 {
-    private:
+    public:
         NExpression *rExp;
         NExpression *lExp;
         int op;
@@ -73,7 +73,7 @@ class NBinaryOperation : public NExpression
 
 class NInteger : public NExpression
 {
-    private:
+    public:
         int value;
 
     public:
@@ -84,7 +84,7 @@ class NInteger : public NExpression
 
 class NNegation : public NExpression
 {
-    private:
+    public:
         NExpression *exp;
 
     public:
@@ -95,7 +95,7 @@ class NNegation : public NExpression
 
 class NReturn : public NExpression
 {
-    private:
+    public:
         NExpression *exp;
 
     public:
@@ -106,7 +106,7 @@ class NReturn : public NExpression
 
 class NIdentifier : public NExpression
 {
-    private:
+    public:
         string identifier;
 
     public:
@@ -118,7 +118,7 @@ class NIdentifier : public NExpression
 
 class NLValue : public NExpression
 {
-    private:
+    public:
         NIdentifier *identifier;
         vector <NExpression*> *indexList;
 
@@ -131,7 +131,7 @@ class NLValue : public NExpression
 
 class NAssign : public NExpression
 {
-    private:
+    public:
         NLValue *lvalue;
         NExpression *exp;
 
@@ -144,7 +144,7 @@ class NAssign : public NExpression
 
 class NIf : public NExpression
 {
-    private:
+    public:
         NExpression *cond;
         NExpression *trueExp;
         NExpression *falseExp;
@@ -158,7 +158,7 @@ class NIf : public NExpression
 
 class NWhile : public NExpression
 {
-    private:
+    public:
         NExpression *cond;
         NExpression *body;
 
@@ -171,7 +171,7 @@ class NWhile : public NExpression
 
 class NFor : public NExpression
 {
-    private:
+    public:
         NIdentifier *identifier;
         NExpression *initExp;
         NExpression *endExp;
@@ -195,7 +195,7 @@ class NBreak : public NExpression
 
 class NArrayCreation : public NExpression
 {
-    private:
+    public:
         NIdentifier *identifier;
         int dimension;
 
@@ -209,7 +209,7 @@ class NArrayCreation : public NExpression
 
 class NFunctionCall : public NExpression
 {
-    private:
+    public:
         NIdentifier *identifier;
         vector <NExpression*> *args;
 
@@ -222,7 +222,7 @@ class NFunctionCall : public NExpression
 
 class NExpressionList : public NExpression
 {
-    private:
+    public:
         vector<NExpression*> *expList;
 
     public:
@@ -239,7 +239,7 @@ class NExpressionList : public NExpression
 
 class NFunctionDec : public NStatement
 {
-    private:
+    public:
         NIdentifier *identifier;
         vector<NIdentifier*> *args;
         NExpression *exp;
@@ -253,7 +253,7 @@ class NFunctionDec : public NStatement
 
 class NImport : public NStatement
 {
-    private:
+    public:
         NIdentifier *identifier;
 
     public:

@@ -1,3 +1,13 @@
+function ff(a, b) = (
+    c := a + b;
+    return c
+)
 
-teste := 1
+v[][];
+
+teste := ff(1, 0, 9);
+
+c := teste + ff;
+
+b := ff(teste, c)
 

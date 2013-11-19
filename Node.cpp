@@ -169,7 +169,7 @@ string NLValue::toString(){
 
 void NLValue::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
-    identifier->analyze(analyzer);
+    //identifier->analyze(analyzer);
 
     if (indexList != NULL)
         for (int i = 0; i < indexList->size(); i++)
@@ -313,7 +313,7 @@ string NArrayCreation::toString(){
 
 void NArrayCreation::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
-    identifier->analyze(analyzer);
+   // identifier->analyze(analyzer);
 }
 
 NFunctionCall::NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args, int lin, int col){
@@ -338,7 +338,7 @@ string NFunctionCall::toString(){
 void NFunctionCall::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
 
-    identifier->analyze(analyzer);
+    //identifier->analyze(analyzer);
 
     if (args != NULL)
         for (int i = 0; i < args->size(); i++)
@@ -396,12 +396,14 @@ string NFunctionDec::toString(){
 void NFunctionDec::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
 
-    identifier->analyze(analyzer);
+    //identifier->analyze(analyzer);
 
-    if (args != NULL)
-        for(int i = 0; i < args->size(); i++)
-            args->at(i)->analyze(analyzer);
-
+    exp->analyze(analyzer);
+//    if (args != NULL)
+//        for(int i = 0; i < args->size(); i++)
+//            args->at(i)->analyze(analyzer);
+            
+    analyzer->eraseScope();
 }
 
 NImport::NImport(NIdentifier *identifier, int lin, int col){
