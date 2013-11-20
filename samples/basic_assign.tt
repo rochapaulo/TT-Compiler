@@ -5,9 +5,20 @@ function ff(a, b) = (
 
 v[][];
 
+
+for i := 0 to 50 do 
+    for j := 0 to 50 do
+        v[i][0] := i+j
+;
+
+
 teste := ff(1, 0, 9);
 
-c := teste + ff;
+c := teste + v[2][2];
+
+v[2] := 3;
+
+v[1][2][2] := if c > 0 then 1 else 2;
 
 b := ff(teste, c)
 

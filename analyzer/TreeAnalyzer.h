@@ -18,8 +18,9 @@ class NIf;
 class NWhile;
 class NFor;
 class NBreak;
-class NLValue;
 class NArrayCreation;
+class NArray;
+class NArrayAssign;
 class NFunctionCall;
 class NExpressionList;
 class NInteger;
@@ -33,6 +34,7 @@ class TreeAnalyzer {
    private:
        SymbolTable *firstScope;
        SymbolTable *secondScope;
+       unsigned int loop;
        void printError(string msg, int lin, int col);
               
    public:
@@ -47,15 +49,17 @@ class TreeAnalyzer {
        void visit(NWhile * exp);
        void visit(NFor *exp);
        void visit(NBreak *exp);
-       void visit(NLValue *exp);
        void visit(NArrayCreation *exp);
+       void visit(NArray *exp);
+       void visit(NArrayAssign *exp);
        void visit(NFunctionCall *exp);
        void visit(NExpressionList *exp);
        void visit(NInteger *exp);
        void visit(NFunctionDec *dec);
        void visit(NImport *dec);
        
-       void eraseScope();       
+       void eraseScope();
+       void exitLoop();
 };
 
 

@@ -1,1 +1,5 @@
-teste11
+
+teste := 1;
+
+c := teste
+

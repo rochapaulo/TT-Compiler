@@ -16,8 +16,9 @@ class NIf;
 class NWhile;
 class NFor;
 class NBreak;
-class NLValue;
 class NArrayCreation;
+class NArray;
+class NArrayAssign;
 class NFunctionCall;
 class NExpressionList;
 class NInteger;
@@ -116,27 +117,15 @@ class NIdentifier : public NExpression
     
 };
 
-class NLValue : public NExpression
-{
-    public:
-        NIdentifier *identifier;
-        vector <NExpression*> *indexList;
-
-    public:
-        NLValue(NIdentifier *identifier, vector <NExpression*> *indexList, int lin, int col);
-        virtual string toString();
-        virtual void analyze(TreeAnalyzer *analyzer);
-
-};
 
 class NAssign : public NExpression
 {
     public:
-        NLValue *lvalue;
+        NIdentifier *identifier;
         NExpression *exp;
 
     public:
-        NAssign(NLValue *lvalue, NExpression *exp, int lin, int col);
+        NAssign(NIdentifier *identifier, NExpression *exp, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
 
@@ -178,7 +167,7 @@ class NFor : public NExpression
         NExpression *body;        
 
     public:
-        NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col);
+        NFor(NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
 
@@ -206,6 +195,30 @@ class NArrayCreation : public NExpression
 
 };
 
+
+class NArray : public NExpression
+{
+    public:
+        NIdentifier *identifier;
+	vector <NExpression*> *indexList;
+
+    public:
+        NArray(NIdentifier *identifier, vector <NExpression*> *indexList, int lin, int col);
+	virtual string toString();
+	virtual void analyze(TreeAnalyzer *analyzer);
+};
+
+class NArrayAssign : public NExpression
+{
+    public:
+        NArray *array;
+	NExpression *exp;
+
+    public:
+        NArrayAssign(NArray *array, NExpression *exp, int lin, int col);
+	virtual string toString();
+	virtual void analyze(TreeAnalyzer *analyzer);
+};
 
 class NFunctionCall : public NExpression
 {

@@ -23,9 +23,9 @@ AST_Program* ast_program;
     int                 	integer;
     int	    	        	op;
     NExpression         	*exp;
+    NArray			*array;
     NStatement          	*dec;
     NIdentifier            	*identifier;
-    NLValue                	*leftValue;
     vector<NExpression*>	*exps;
     vector<NStatement*>    	*decs;
     vector<NIdentifier*>   	*tyfields;
@@ -61,6 +61,7 @@ AST_Program* ast_program;
 %type <exp> break_exp
 %type <exp> funcall
 %type <exp> array_creation
+%type <exp> array_assign
 %type <exp> assign
 %type <exps> exps
 %type <exps> dimension_acc
@@ -75,8 +76,8 @@ AST_Program* ast_program;
 %type <decs> decseq
 
 %type <tyfields> tyfields
-%type <leftValue> leftValue
 %type <identifier> identifier
+%type <array> array
 %type <integer> dimensions
 
 %%
@@ -105,6 +106,10 @@ exp
         $$ = $1;
     }
     | assign
+    {
+        $$ = $1;
+    }
+    | array_assign
     {
         $$ = $1;
     }
@@ -148,6 +153,10 @@ binary_exp
 
 term 
     : identifier
+    {
+        $$ = $1;
+    }
+    | array
     {
         $$ = $1;
     }
@@ -212,20 +221,23 @@ neg_exp
     ;
 
 assign 
-    :  leftValue ASSIGN exp
+    :  identifier ASSIGN exp
     {
         $$ = new NAssign($1, $3, yylineno, yycolumn);
     }
     ;
 
-leftValue
-    : identifier 
+array_assign
+    : array ASSIGN exp
     {
-        $$ = new NLValue($1, NULL, yylineno, yycolumn);
+        $$ = new NArrayAssign($1, $3, yylineno, yycolumn);
     }
-    | identifier dimension_acc
+    ;
+
+array
+    : identifier dimension_acc
     {
-        $$ = new NLValue($1, $2, yylineno, yycolumn);
+        $$ = new NArray($1, $2, yylineno, yycolumn);
     }
     ;
 
@@ -262,9 +274,9 @@ while_exp
     ;
 
 for_exp
-    : FOR identifier ASSIGN exp TO exp DO exp
+    : FOR exp TO exp DO exp
     {
-        $$ = new NFor($2, $4, $6, $8, yylineno, yycolumn);
+        $$ = new NFor($2, $4, $6, yylineno, yycolumn);
     }
     ;
 

@@ -1,4 +1,5 @@
 #include "Node.h"
+#include <iostream>
 
 void Node::setLine(int lin){
     this->lin = lin;
@@ -148,46 +149,17 @@ void NIdentifier::analyze(TreeAnalyzer *analyzer)
     analyzer->visit(this);
 }
 
-NLValue::NLValue(NIdentifier *identifier, vector <NExpression*> *indexList, int lin, int col){
+NAssign::NAssign(NIdentifier *identifier, NExpression *exp, int lin, int col){
     this->setLine(lin);
     this->setColumn(col);
     this->identifier = identifier;
-    this->indexList = indexList;
-}
-
-string NLValue::toString(){
-    stringstream stream;
-    stream << "<LVALUE>\n" << identifier->toString() << "</LVALUE>\n";
-
-    if (indexList != NULL){
-        for (int i = 0; i < indexList->size(); i++)
-            stream << "<INDEX>\n" << indexList->at(i)->toString() << "</INDEX>\n";
-    }
-
-    return stream.str();
-}
-
-void NLValue::analyze(TreeAnalyzer *analyzer){
-    analyzer->visit(this);
-    //identifier->analyze(analyzer);
-
-    if (indexList != NULL)
-        for (int i = 0; i < indexList->size(); i++)
-            indexList->at(i)->analyze(analyzer);
-
-}
-
-NAssign::NAssign(NLValue *lvalue, NExpression *exp, int lin, int col){
-    this->setLine(lin);
-    this->setColumn(col);
-    this->lvalue = lvalue;
     this->exp = exp;
 }
 
 string NAssign::toString(){
     stringstream stream;
     stream << "<ASSIGN>\n"
-        << "<LEFT_EXPRESSION>\n" << lvalue->toString() << "</LEFT_EXPRESSION>\n"
+        << "<LEFT_EXPRESSION>\n" << identifier->toString() << "</LEFT_EXPRESSION>\n"
         << "<RIGHT_EXPRESSION>\n" << exp->toString() << "</RIGHT_EXPRESSION>\n"
         << "</ASSIGN>\n";
     return stream.str();
@@ -195,7 +167,7 @@ string NAssign::toString(){
 
 void NAssign::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
-    lvalue->analyze(analyzer);
+    //identifier->analyze(analyzer);
     exp->analyze(analyzer);
 }
 
@@ -248,12 +220,13 @@ void NWhile::analyze(TreeAnalyzer *analyzer){
 
     cond->analyze(analyzer);
     body->analyze(analyzer);
+
+    analyzer->exitLoop();
 }
 
-NFor::NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col){
+NFor::NFor(NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col){
     this->setLine(lin);
     this->setColumn(col);
-    this->identifier = identifier;
     this->initExp = initExp;
     this->endExp = endExp;
     this->body = body;
@@ -261,8 +234,7 @@ NFor::NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, N
 
 string NFor::toString(){
     stringstream stream;
-    stream << "<FOR>\n" << identifier->toString()
-        << "<ASSIGN>\n" << initExp->toString() << "</ASSIGN>\n"
+    stream << "<FOR>\n" << initExp->toString()
         << "<TO>\n" << endExp->toString() << "</TO>\n"
         << "<DO>\n" << body->toString() << "</DO>\n"
         << "</FOR>\n";
@@ -272,10 +244,11 @@ string NFor::toString(){
 void NFor::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
 
-    identifier->analyze(analyzer);
     initExp->analyze(analyzer);
     endExp->analyze(analyzer);
     body->analyze(analyzer);
+
+    analyzer->exitLoop();
 }
 
 NBreak::NBreak(int lin, int col){
@@ -314,6 +287,44 @@ string NArrayCreation::toString(){
 void NArrayCreation::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
    // identifier->analyze(analyzer);
+}
+
+NArray::NArray(NIdentifier *identifier, vector <NExpression*> *indexList, int lin, int col){
+    this->setLine(lin);
+    this->setColumn(col);
+    this->identifier = identifier;
+    this->indexList = indexList;
+}
+
+string NArray::toString(){
+    return "array\n";
+}
+
+void NArray::analyze(TreeAnalyzer *analyzer){
+    
+    analyzer->visit(this);
+
+    for (int i = 0; i < indexList->size(); i++)
+        indexList->at(i)->analyze(analyzer);
+}
+
+NArrayAssign::NArrayAssign(NArray *array, NExpression *exp, int lin, int col){
+    this->setLine(lin);
+    this->setColumn(col);
+    this->array = array;
+    this->exp = exp;
+}
+
+string NArrayAssign::toString(){
+    return "array assign\n";
+}
+
+void NArrayAssign::analyze(TreeAnalyzer *analyzer){
+    analyzer->visit(this);
+
+    array->analyze(analyzer);
+
+    exp->analyze(analyzer);
 }
 
 NFunctionCall::NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args, int lin, int col){
@@ -422,3 +433,4 @@ void NImport::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
     identifier->analyze(analyzer);
 }
+
