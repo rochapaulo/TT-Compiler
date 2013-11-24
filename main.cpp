@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <vector>
 #include "TreeAnalyzer.h"
-#include "IRTree.h"
+#include "IRNode.h"
 #include "Node.h"
 
 using namespace std;
@@ -19,9 +19,6 @@ vector <IRNode *> *irlist;
 string getOperation(int);
 
 int main(int argc, char *argv[]) {
-
-    //IRName *name = new IRName("teste");
-
 
     if (argc < 3) {
         cout << "Please specify the input and output file" << endl;
@@ -59,5 +56,3 @@ int main(int argc, char *argv[]) {
 
     return 1;
 }
-
-

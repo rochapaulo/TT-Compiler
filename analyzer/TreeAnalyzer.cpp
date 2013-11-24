@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Node.h"
+#include <stdlib.h>
 //#include "IRTree.h"
 
 using namespace std;
