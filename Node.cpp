@@ -167,7 +167,6 @@ string NAssign::toString(){
 
 void NAssign::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
-    //identifier->analyze(analyzer);
     exp->analyze(analyzer);
 }
 
@@ -224,9 +223,10 @@ void NWhile::analyze(TreeAnalyzer *analyzer){
     analyzer->exitLoop();
 }
 
-NFor::NFor(NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col){
+NFor::NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col){
     this->setLine(lin);
     this->setColumn(col);
+    this->identifier = identifier;
     this->initExp = initExp;
     this->endExp = endExp;
     this->body = body;
@@ -234,7 +234,8 @@ NFor::NFor(NExpression *initExp, NExpression *endExp, NExpression *body, int lin
 
 string NFor::toString(){
     stringstream stream;
-    stream << "<FOR>\n" << initExp->toString()
+    stream << "<FOR>\n" << identifier->toString()
+        << "<ASSIGN>\n" << initExp->toString() << "</ASSIGN>\n"
         << "<TO>\n" << endExp->toString() << "</TO>\n"
         << "<DO>\n" << body->toString() << "</DO>\n"
         << "</FOR>\n";
@@ -297,7 +298,17 @@ NArray::NArray(NIdentifier *identifier, vector <NExpression*> *indexList, int li
 }
 
 string NArray::toString(){
-    return "array\n";
+    stringstream stream;
+    stream << "<ARRAY>\n"
+        << "IDENTIFIER>" << identifier->identifier << "</IDENTIFIER>\n";
+    
+    if (indexList)
+        for (int i = 0; i < indexList->size(); i++)
+	    stream << "<DIMENSION>\n" << indexList->at(i)->toString() << "</DIMENSION>\n";
+
+    stream << "</ARRAY>\n";
+
+    return stream.str();
 }
 
 void NArray::analyze(TreeAnalyzer *analyzer){
@@ -316,7 +327,12 @@ NArrayAssign::NArrayAssign(NArray *array, NExpression *exp, int lin, int col){
 }
 
 string NArrayAssign::toString(){
-    return "array assign\n";
+    stringstream stream;
+    stream << "<ASSIGN>\n"
+        << "<LEFT_EXPRESSION>\n" << array->toString() << "</LEFT_EXPRESSION>\n"
+        << "<RIGHT_EXPRESSION>\n" << exp->toString() << "</RIGHT_EXPRESSION>\n"
+        << "</ASSIGN>\n";
+    return stream.str();
 }
 
 void NArrayAssign::analyze(TreeAnalyzer *analyzer){

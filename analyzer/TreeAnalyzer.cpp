@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Node.h"
+//#include "IRTree.h"
 
 using namespace std;
 
@@ -49,6 +50,7 @@ void TreeAnalyzer::visit(NWhile *exp) {
 }
 
 void TreeAnalyzer::visit(NFor *exp) {
+    (*firstScope)[exp->identifier->identifier] = exp->identifier;
     loop ++;
 }
 
@@ -69,7 +71,7 @@ void TreeAnalyzer::visit(NArray *exp){
              it = secondScope->find(exp->identifier->identifier);
    
     NArrayCreation* array = dynamic_cast<NArrayCreation*>(it->second);
-    if (!array || exp->indexList->size() > array->dimension) {
+    if (!array || exp->indexList->size() != array->dimension) {
         printError("Undeclared array \'" + exp->identifier->identifier + "\'", exp->lin, exp->col);
     } 
 }

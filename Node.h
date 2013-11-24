@@ -51,7 +51,7 @@ class AST_Program : public Node
 {
     public:
         vector <NStatement*> *stmList;
-		vector <NExpression*> *expList;
+	vector <NExpression*> *expList;
 
     public:
         AST_Program(vector<NStatement*> *stmList, vector<NExpression*> *expList, int lin, int col);
@@ -167,7 +167,7 @@ class NFor : public NExpression
         NExpression *body;        
 
     public:
-        NFor(NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col);
+        NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
 

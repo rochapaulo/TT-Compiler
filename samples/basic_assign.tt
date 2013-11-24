@@ -3,7 +3,7 @@ function ff(a, b) = (
     return c
 )
 
-v[][];
+v := [][];
 
 
 for i := 0 to 50 do 

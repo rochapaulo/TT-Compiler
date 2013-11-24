@@ -2,8 +2,8 @@ CC = c++
 BISON = bison
 FLEX = flex
 EXEC = parser
-PATHS = -I./analyzer -I./
-FILES = parser.cpp lex.yy.c Node.cpp ./analyzer/TreeAnalyzer.cpp main.cpp
+PATHS = -I./ir -I./analyzer -I./
+FILES = parser.cpp lex.yy.c Node.cpp ./ir/IRTree.cpp ./analyzer/TreeAnalyzer.cpp main.cpp
 
 all: $(EXEC) clean
 

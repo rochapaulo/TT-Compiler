@@ -274,9 +274,9 @@ while_exp
     ;
 
 for_exp
-    : FOR exp TO exp DO exp
+    : FOR identifier ASSIGN exp TO exp DO exp
     {
-        $$ = new NFor($2, $4, $6, yylineno, yycolumn);
+        $$ = new NFor($2, $4, $6, $8, yylineno, yycolumn);
     }
     ;
 
@@ -295,9 +295,9 @@ break_exp
     ;
 
 array_creation 
-    : identifier dimensions
+    : identifier ASSIGN dimensions
     {
-        $$ = new NArrayCreation($1, $2, yylineno, yycolumn);
+        $$ = new NArrayCreation($1, $3, yylineno, yycolumn);
     }
     ;
 

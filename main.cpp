@@ -3,7 +3,9 @@
 #include <cstring>
 #include <stdlib.h>
 #include <stdio.h>
+#include <vector>
 #include "TreeAnalyzer.h"
+#include "IRTree.h"
 #include "Node.h"
 
 using namespace std;
@@ -12,10 +14,14 @@ extern AST_Program * ast_program;
 extern FILE *yyin, *yyout;
 extern int yyparse();
 TreeAnalyzer *analyzer;
+vector <IRNode *> *irlist;
 
 string getOperation(int);
 
 int main(int argc, char *argv[]) {
+
+    //IRName *name = new IRName("teste");
+
 
     if (argc < 3) {
         cout << "Please specify the input and output file" << endl;
@@ -38,17 +44,15 @@ int main(int argc, char *argv[]) {
     cout << "Parsing Program ..." << endl;
     if (yyparse() == 0)	{
         cout << "Parse complete." << endl;
-        
-		ofstream outfile(argv[2]);
+        ofstream outfile(argv[2]);
         outfile << ast_program->toString();
         
         cout << "Analyzing Semantics ..." << endl; 
-	    analyzer = new TreeAnalyzer();	
-	    ast_program->analyze(analyzer);
-	
-	    cout << "Analyze complete." << endl;
-
-   }
+	analyzer = new TreeAnalyzer();	
+	ast_program->analyze(analyzer);
+        	
+	cout << "Analyze complete." << endl;
+    }
 
     fclose(p_infile);
     fclose(p_outfile);
