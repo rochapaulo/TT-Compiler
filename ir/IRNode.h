@@ -47,7 +47,7 @@ class IRTemp : public IRExp
 
 class IRBinop : public IRExp
 {
-    public:
+   public:
         int binop;
         IRExp *lExp;
         IRExp *rExp;
@@ -70,11 +70,11 @@ class IRMem : public IRExp
 class IRCall : public IRExp
 {
     public:
-        IRExp *func;
+        IRLabel *label;
         vector <IRExp*> *args;
 
     public:
-        IRCall(IRExp *func, vector <IRExp*> *args);
+        IRCall(IRLabel *label, vector <IRExp*> *args);
         virtual string toString();
 };
 
@@ -106,9 +106,10 @@ class IRJump : public IRStm
 {
     public:
         IRLabel *label;
+	IRExp *exp;
 
     public:
-        IRJump(IRLabel *label);
+        IRJump(IRLabel *label, IRExp *exp);
         virtual string toString();
 };
 
@@ -116,12 +117,13 @@ class IRCJump : public IRStm
 {
     public:
         int relop;
-        IRExp *exp;
+        IRExp *lExp;
+        IRExp *rExp;
         IRLabel *iftrue;
         IRLabel *iffalse;
 
     public:
-        IRCJump(int relop, IRExp *exp, IRLabel *iftrue, IRLabel *iffalse);
+        IRCJump(int relop, IRExp *lExp, IRExp *rExp, IRLabel *iftrue, IRLabel *iffalse);
         virtual string toString();
 };
 
