@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 #include "TreeAnalyzer.h"
+#include "IRTreeGen.h"
 
 class Node;
 class NExpression;
@@ -26,6 +27,7 @@ class NFunctionDec;
 class NImport;
 
 using namespace std;
+extern IRTreeGen *irGen;
 
 class Node
 {
@@ -38,6 +40,7 @@ class Node
 
         virtual string toString() = 0;
         virtual void analyze(TreeAnalyzer *analyzer) = 0;
+        virtual void genCode() = 0;
 
         void setLine(int lin);
         void setColumn(int col);
@@ -57,6 +60,7 @@ class AST_Program : public Node
         AST_Program(vector<NStatement*> *stmList, vector<NExpression*> *expList, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
 
 class NBinaryOperation : public NExpression
@@ -70,6 +74,7 @@ class NBinaryOperation : public NExpression
         NBinaryOperation(NExpression *lExp, int op, NExpression *rExp, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
 
 class NInteger : public NExpression
@@ -81,6 +86,7 @@ class NInteger : public NExpression
         NInteger(int value, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
 
 class NNegation : public NExpression
@@ -92,6 +98,7 @@ class NNegation : public NExpression
         NNegation(NExpression *exp, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
 
 class NReturn : public NExpression
@@ -103,6 +110,7 @@ class NReturn : public NExpression
         NReturn(NExpression *exp, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
 
 class NIdentifier : public NExpression
@@ -114,7 +122,7 @@ class NIdentifier : public NExpression
         NIdentifier(char *identifier, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
-    
+        virtual void genCode();
 };
 
 
@@ -128,7 +136,7 @@ class NAssign : public NExpression
         NAssign(NIdentifier *identifier, NExpression *exp, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
-
+        virtual void genCode();
 };
 
 class NIf : public NExpression
@@ -142,7 +150,7 @@ class NIf : public NExpression
         NIf(NExpression *cond, NExpression *trueExp, NExpression *falseExp, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
-
+        virtual void genCode();
 };
 
 class NWhile : public NExpression
@@ -155,7 +163,7 @@ class NWhile : public NExpression
         NWhile(NExpression *cond, NExpression *body, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
-
+        virtual void genCode();
 };
 
 class NFor : public NExpression
@@ -170,7 +178,7 @@ class NFor : public NExpression
         NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
-
+        virtual void genCode();
 };
 
 class NBreak : public NExpression
@@ -179,7 +187,7 @@ class NBreak : public NExpression
         NBreak(int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
-    
+        virtual void genCode();
 };
 
 class NArrayCreation : public NExpression
@@ -192,7 +200,7 @@ class NArrayCreation : public NExpression
         NArrayCreation(NIdentifier *identifier, int dimension, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
-
+        virtual void genCode();
 };
 
 
@@ -200,12 +208,13 @@ class NArray : public NExpression
 {
     public:
         NIdentifier *identifier;
-	vector <NExpression*> *indexList;
+	    vector <NExpression*> *indexList;
 
     public:
         NArray(NIdentifier *identifier, vector <NExpression*> *indexList, int lin, int col);
-	virtual string toString();
-	virtual void analyze(TreeAnalyzer *analyzer);
+	    virtual string toString();
+	    virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
 
 class NArrayAssign : public NExpression
@@ -216,8 +225,9 @@ class NArrayAssign : public NExpression
 
     public:
         NArrayAssign(NArray *array, NExpression *exp, int lin, int col);
-	virtual string toString();
-	virtual void analyze(TreeAnalyzer *analyzer);
+	    virtual string toString();
+	    virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
 
 class NFunctionCall : public NExpression
@@ -227,10 +237,10 @@ class NFunctionCall : public NExpression
         vector <NExpression*> *args;
 
     public:
-    NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args, int lin, int col);
-    virtual string toString();
-    virtual void analyze(TreeAnalyzer *analyzer);
-
+        NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args, int lin, int col);
+        virtual string toString();
+        virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
 
 class NExpressionList : public NExpression
@@ -239,16 +249,11 @@ class NExpressionList : public NExpression
         vector<NExpression*> *expList;
 
     public:
-    NExpressionList(vector<NExpression*> *expList, int lin, int col);
-    virtual string toString();
-    virtual void analyze(TreeAnalyzer *analyzer);
-    
+        NExpressionList(vector<NExpression*> *expList, int lin, int col);
+        virtual string toString();
+        virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
-
-
-/*
-   DECLARATIONS
- */
 
 class NFunctionDec : public NStatement
 {
@@ -261,7 +266,7 @@ class NFunctionDec : public NStatement
         NFunctionDec(NIdentifier *identifier, vector<NIdentifier*> *args, NExpression *exp, int lin, int col);
         virtual string toString();
         virtual void analyze(TreeAnalyzer *analyzer);
-    
+        virtual void genCode();
 };
 
 class NImport : public NStatement
@@ -270,9 +275,9 @@ class NImport : public NStatement
         NIdentifier *identifier;
 
     public:
-    NImport(NIdentifier *identifier, int lin, int col);
-    virtual string toString();
-    virtual void analyze(TreeAnalyzer *analyzer);
-    
+        NImport(NIdentifier *identifier, int lin, int col);
+        virtual string toString();
+        virtual void analyze(TreeAnalyzer *analyzer);
+        virtual void genCode();
 };
 

@@ -57,7 +57,7 @@ class TreeAnalyzer {
        void visit(NInteger *exp);
        void visit(NFunctionDec *dec);
        void visit(NImport *dec);
-       
+     
        void eraseScope();
        void exitLoop();
 };
