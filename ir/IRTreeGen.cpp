@@ -63,6 +63,5 @@ IRNode IRTreeGen::genCode(NImport *dec) {
 }
 
 vector<IRNode*> IRTreeGen::getIntermediateCode(AST_Program *program) {
-    program->genCode();
     return irCodeList;
 }

@@ -13,10 +13,12 @@ using namespace std;
 extern AST_Program * ast_program;
 extern FILE *yyin, *yyout;
 extern int yyparse();
+extern IRTreeGen *irGen;
+
 TreeAnalyzer *analyzer;
-vector <IRNode *> *irlist;
 
 string getOperation(int);
+
 
 int main(int argc, char *argv[]) {
 
@@ -30,7 +32,7 @@ int main(int argc, char *argv[]) {
         cout << "couldn't open file" << endl;
         exit(0);
     }
-    
+
     FILE *p_outfile = fopen(argv[2], "w");
     if(!p_outfile) {
         cout << "couldn't write file" << endl;
@@ -43,12 +45,15 @@ int main(int argc, char *argv[]) {
         cout << "Parse complete." << endl;
         ofstream outfile(argv[2]);
         outfile << ast_program->toString();
-        
+
         cout << "Analyzing Semantics ..." << endl; 
-	analyzer = new TreeAnalyzer();	
-	ast_program->analyze(analyzer);
-        	
-	cout << "Analyze complete." << endl;
+        analyzer = new TreeAnalyzer();	
+        ast_program->analyze(analyzer);
+
+        cout << "Generating Intermediate Code ..." << endl;
+        vector<IRNode*> irNodeList = irGen->getIntermediateCode(ast_program);
+
+        cout << "Analyze complete." << endl;
     }
 
     fclose(p_infile);

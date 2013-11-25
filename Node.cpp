@@ -3,6 +3,7 @@
 #include <iostream>
 
 IRTreeGen *irGen;
+vector<IRNode*> irNodeList;
 
 void Node::setLine(int lin){
     this->lin = lin;
@@ -51,13 +52,13 @@ void AST_Program::analyze(TreeAnalyzer *analyzer) {
     if (stmList != NULL)
         for (int i = 0; i < stmList->size(); i++) {
             stmList->at(i)->analyze(analyzer);
-            stmList->at(i)->genCode();
+            irNodeList.push_back(stmList->at(i)->genCode());
         }
 
     if (expList != NULL)
         for (int i = 0; i < expList->size(); i++) {
             expList->at(i)->analyze(analyzer);
-            expList->at(i)->genCode();
+            irNodeList.push_back(expList->at(i)->genCode());
         }	
 }
 
@@ -85,9 +86,9 @@ string NBinaryOperation::toString(){
 
 void NBinaryOperation::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
-
     rExp->analyze(analyzer);
     lExp->analyze(analyzer);
+    this->genCode();
 }
 
 IRNode NBinaryOperation::genCode(){
@@ -108,6 +109,7 @@ string NInteger::toString(){
 
 void NInteger::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
+    this->genCode();
 }
 
 IRNode NInteger::genCode(){
@@ -129,6 +131,7 @@ string NNegation::toString(){
 void NNegation::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
     exp->analyze(analyzer);
+    this->genCode();
 }
 
 IRNode NNegation::genCode(){
@@ -151,6 +154,7 @@ void NReturn::analyze(TreeAnalyzer *analyzer)
 {
     analyzer->visit(this);
     exp->analyze(analyzer);
+    this->genCode();
 }
 
 IRNode NReturn::genCode(){
@@ -174,6 +178,7 @@ string NIdentifier::toString()
 void NIdentifier::analyze(TreeAnalyzer *analyzer)
 {
     analyzer->visit(this);
+    this->genCode();
 }
 
 IRNode NIdentifier::genCode(){
@@ -199,6 +204,7 @@ string NAssign::toString(){
 void NAssign::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
     exp->analyze(analyzer);
+    this->genCode();
 }
 
 IRNode NAssign::genCode(){
@@ -232,6 +238,8 @@ void NIf::analyze(TreeAnalyzer *analyzer){
     trueExp->analyze(analyzer);
     if (falseExp != NULL)
         falseExp->analyze(analyzer);
+
+    this->genCode();
 }
 
 IRNode NIf::genCode(){
@@ -258,6 +266,7 @@ void NWhile::analyze(TreeAnalyzer *analyzer){
     cond->analyze(analyzer);
     body->analyze(analyzer);
     analyzer->exitLoop();
+    this->genCode();
 }
 
 IRNode NWhile::genCode(){
@@ -285,12 +294,11 @@ string NFor::toString(){
 
 void NFor::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
-
     initExp->analyze(analyzer);
     endExp->analyze(analyzer);
     body->analyze(analyzer);
-
     analyzer->exitLoop();
+    this->genCode();
 }
 
 IRNode NFor::genCode(){
@@ -310,6 +318,7 @@ string NBreak::toString(){
 
 void NBreak::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
+    this->genCode();
 }
 
 IRNode NBreak::genCode(){
@@ -336,6 +345,7 @@ string NArrayCreation::toString(){
 
 void NArrayCreation::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
+    this->genCode();
 }
 
 IRNode NArrayCreation::genCode(){
@@ -364,11 +374,11 @@ string NArray::toString(){
 }
 
 void NArray::analyze(TreeAnalyzer *analyzer){
-
     analyzer->visit(this);
-
-    for (int i = 0; i < indexList->size(); i++)
+    for (int i = 0; i < indexList->size(); i++) {
         indexList->at(i)->analyze(analyzer);
+    }
+    this->genCode();
 }
 
 IRNode NArray::genCode(){
@@ -393,10 +403,9 @@ string NArrayAssign::toString(){
 
 void NArrayAssign::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
-
     array->analyze(analyzer);
-
     exp->analyze(analyzer);
+    this->genCode();
 }
 
 IRNode NArrayAssign::genCode(){
@@ -428,6 +437,8 @@ void NFunctionCall::analyze(TreeAnalyzer *analyzer){
     if (args != NULL)
         for (int i = 0; i < args->size(); i++)
             args->at(i)->analyze(analyzer);
+
+    this->genCode();
 }
 
 IRNode NFunctionCall::genCode(){
@@ -457,6 +468,7 @@ void NExpressionList::analyze(TreeAnalyzer *analyzer){
     for (int i = 0; i < expList->size(); i++)
         expList->at(i)->analyze(analyzer);
 
+    this->genCode();
 }
 
 IRNode NExpressionList::genCode(){
@@ -490,6 +502,7 @@ void NFunctionDec::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
     exp->analyze(analyzer);
     analyzer->eraseScope();
+    this->genCode();
 }
 
 IRNode NFunctionDec::genCode(){
@@ -511,6 +524,7 @@ string NImport::toString(){
 void NImport::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
     identifier->analyze(analyzer);
+    this->genCode();
 }
 
 IRNode NImport::genCode(){
