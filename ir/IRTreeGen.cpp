@@ -8,58 +8,58 @@ using namespace std;
 IRTreeGen::IRTreeGen() {
 }
 
-void IRTreeGen::genCode(AST_Program *program) {
+IRNode IRTreeGen::genCode(AST_Program *program) {
 }
 
-void IRTreeGen::genCode(NBinaryOperation *exp) {
+IRNode IRTreeGen::genCode(NBinaryOperation *exp) {
 }
 
-void IRTreeGen::genCode(NNegation *exp) {
+IRNode IRTreeGen::genCode(NNegation *exp) {
 }
 
-void IRTreeGen::genCode(NReturn *exp) {
+IRNode IRTreeGen::genCode(NReturn *exp) {
 }
 
-void IRTreeGen::genCode(NIdentifier *exp) {
+IRNode IRTreeGen::genCode(NIdentifier *exp) {
 }
 
-void IRTreeGen::genCode(NAssign *exp) {
+IRNode IRTreeGen::genCode(NAssign *exp) {
 }
 
-void IRTreeGen::genCode(NIf *exp) {
+IRNode IRTreeGen::genCode(NIf *exp) {
 }
 
-void IRTreeGen::genCode(NWhile *exp) {
+IRNode IRTreeGen::genCode(NWhile *exp) {
 }
 
-void IRTreeGen::genCode(NFor *exp) {
+IRNode IRTreeGen::genCode(NFor *exp) {
 }
 
-void IRTreeGen::genCode(NBreak *exp) {
+IRNode IRTreeGen::genCode(NBreak *exp) {
 }
 
-void IRTreeGen::genCode(NArrayCreation *exp) {
+IRNode IRTreeGen::genCode(NArrayCreation *exp) {
 }
 
-void IRTreeGen::genCode(NArray *exp){
+IRNode IRTreeGen::genCode(NArray *exp){
 }
 
-void IRTreeGen::genCode(NArrayAssign *exp){
+IRNode IRTreeGen::genCode(NArrayAssign *exp){
 }
 
-void IRTreeGen::genCode(NFunctionCall *exp) {
+IRNode IRTreeGen::genCode(NFunctionCall *exp) {
 }
 
-void IRTreeGen::genCode(NExpressionList *exp){
+IRNode IRTreeGen::genCode(NExpressionList *exp){
 }
 
-void IRTreeGen::genCode(NInteger *exp) {
+IRNode IRTreeGen::genCode(NInteger *exp) {
 }
 
-void IRTreeGen::genCode(NFunctionDec *dec) {
+IRNode IRTreeGen::genCode(NFunctionDec *dec) {
 }
 
-void IRTreeGen::genCode(NImport *dec) {
+IRNode IRTreeGen::genCode(NImport *dec) {
 }
 
 vector<IRNode*> IRTreeGen::getIntermediateCode(AST_Program *program) {

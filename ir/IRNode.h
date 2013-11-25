@@ -1,3 +1,6 @@
+#ifndef IRNode_H
+#define IRNode_H
+
 #include <vector>
 #include <string>
 
@@ -8,8 +11,8 @@ class IRLabel;
 class IRNode
 {
     public:
-        virtual ~IRNode() {}
-        virtual string toString() = 0;
+        IRNode() {};
+        string toString() {};
 };
 
 class IRExp : public IRNode {};
@@ -22,7 +25,7 @@ class IRConst : public IRExp
 
     public:
         IRConst(int value);
-        virtual string toString();
+        string toString();
 };
 
 class IRName : public IRExp
@@ -32,7 +35,7 @@ class IRName : public IRExp
 
     public:
         IRName(string label);
-        virtual string toString();
+        string toString();
 };
 
 class IRTemp : public IRExp
@@ -42,7 +45,7 @@ class IRTemp : public IRExp
 
     public:
         IRTemp(string temp);
-        virtual string toString();
+        string toString();
 };
 
 class IRBinop : public IRExp
@@ -54,7 +57,7 @@ class IRBinop : public IRExp
 
     public:
         IRBinop(int binop, IRExp *lExp, IRExp *rExp);
-        virtual string toString();
+        string toString();
 };
 
 class IRMem : public IRExp
@@ -64,7 +67,7 @@ class IRMem : public IRExp
 
     public:
         IRMem(IRExp *exp);
-        virtual string toString();
+        string toString();
 };
 
 class IRCall : public IRExp
@@ -75,7 +78,7 @@ class IRCall : public IRExp
 
     public:
         IRCall(IRLabel *label, vector <IRExp*> *args);
-        virtual string toString();
+        string toString();
 };
 
 class IREseq : public IRExp
@@ -86,7 +89,7 @@ class IREseq : public IRExp
 
     public:
         IREseq(IRStm *stm, IRExp *exp);
-        virtual string toString();
+        string toString();
 };
 
 class IRExpList : public IRExp
@@ -96,7 +99,7 @@ class IRExpList : public IRExp
     
     public:
         IRExpList(vector <IRExp*> *exps);
-	virtual string toString();
+	string toString();
 };
 
 class IRMove : public IRStm
@@ -107,7 +110,7 @@ class IRMove : public IRStm
 
     public:
         IRMove(IRExp *dst, IRExp *src);	
-        virtual string toString();
+        string toString();
 };
 
 
@@ -119,7 +122,7 @@ class IRJump : public IRStm
 
     public:
         IRJump(IRLabel *label, IRExp *exp);
-        virtual string toString();
+        string toString();
 };
 
 class IRCJump : public IRStm
@@ -133,7 +136,7 @@ class IRCJump : public IRStm
 
     public:
         IRCJump(int relop, IRExp *lExp, IRExp *rExp, IRLabel *iftrue, IRLabel *iffalse);
-        virtual string toString();
+        string toString();
 };
 
 class IRSeq : public IRStm
@@ -144,7 +147,7 @@ class IRSeq : public IRStm
 
     public:
         IRSeq(IRStm *left, IRStm *right);
-        virtual string toString();
+        string toString();
 };
 
 class IRLabel : public IRStm
@@ -154,8 +157,7 @@ class IRLabel : public IRStm
 
     public:
         IRLabel(string label);
-        virtual string toString();
+        string toString();
 };
 
-
-
+#endif

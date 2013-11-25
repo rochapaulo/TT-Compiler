@@ -34,24 +34,24 @@ class IRTreeGen {
 
    public:
        IRTreeGen();
-       void genCode(AST_Program *program);
-       void genCode(NBinaryOperation *exp);
-       void genCode(NNegation *exp);
-       void genCode(NReturn *exp);
-       void genCode(NIdentifier *exp);
-       void genCode(NAssign *exp);
-       void genCode(NIf *exp);
-       void genCode(NWhile * exp);
-       void genCode(NFor *exp);
-       void genCode(NBreak *exp);
-       void genCode(NArrayCreation *exp);
-       void genCode(NArray *exp);
-       void genCode(NArrayAssign *exp);
-       void genCode(NFunctionCall *exp);
-       void genCode(NExpressionList *exp);
-       void genCode(NInteger *exp);
-       void genCode(NFunctionDec *dec);
-       void genCode(NImport *dec);
+       IRNode genCode(AST_Program *program);
+       IRNode genCode(NBinaryOperation *exp);
+       IRNode genCode(NNegation *exp);
+       IRNode genCode(NReturn *exp);
+       IRNode genCode(NIdentifier *exp);
+       IRNode genCode(NAssign *exp);
+       IRNode genCode(NIf *exp);
+       IRNode genCode(NWhile * exp);
+       IRNode genCode(NFor *exp);
+       IRNode genCode(NBreak *exp);
+       IRNode genCode(NArrayCreation *exp);
+       IRNode genCode(NArray *exp);
+       IRNode genCode(NArrayAssign *exp);
+       IRNode genCode(NFunctionCall *exp);
+       IRNode genCode(NExpressionList *exp);
+       IRNode genCode(NInteger *exp);
+       IRNode genCode(NFunctionDec *dec);
+       IRNode genCode(NImport *dec);
 
        vector<IRNode*> getIntermediateCode(AST_Program *program);
 };

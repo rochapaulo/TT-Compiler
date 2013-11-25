@@ -49,16 +49,20 @@ string AST_Program::toString(){
 void AST_Program::analyze(TreeAnalyzer *analyzer) {
     analyzer->visit(this);
     if (stmList != NULL)
-        for (int i = 0; i < stmList->size(); i++)
-            stmList->at(i)->analyze(analyzer);	  
+        for (int i = 0; i < stmList->size(); i++) {
+            stmList->at(i)->analyze(analyzer);
+            stmList->at(i)->genCode();
+        }
 
     if (expList != NULL)
-        for (int i = 0; i < expList->size(); i++)
-            expList->at(i)->analyze(analyzer);		
+        for (int i = 0; i < expList->size(); i++) {
+            expList->at(i)->analyze(analyzer);
+            expList->at(i)->genCode();
+        }	
 }
 
-void AST_Program::genCode(){
-    irGen->genCode(this);
+IRNode AST_Program::genCode() {
+    return irGen->genCode(this);
 }
 
 NBinaryOperation::NBinaryOperation(NExpression *lExp, int op, NExpression *rExp, int lin, int col) {
@@ -86,8 +90,8 @@ void NBinaryOperation::analyze(TreeAnalyzer *analyzer){
     lExp->analyze(analyzer);
 }
 
-void NBinaryOperation::genCode(){
-    irGen->genCode(this);
+IRNode NBinaryOperation::genCode(){
+    return irGen->genCode(this);
 }
 
 NInteger::NInteger(int value, int lin, int col){
@@ -106,8 +110,8 @@ void NInteger::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
 }
 
-void NInteger::genCode(){
-    irGen->genCode(this);
+IRNode NInteger::genCode(){
+    return irGen->genCode(this);
 }
 
 NNegation::NNegation(NExpression *exp, int lin, int col){
@@ -127,8 +131,8 @@ void NNegation::analyze(TreeAnalyzer *analyzer){
     exp->analyze(analyzer);
 }
 
-void NNegation::genCode(){
-    irGen->genCode(this);
+IRNode NNegation::genCode(){
+    return irGen->genCode(this);
 }
 
 NReturn::NReturn(NExpression *exp, int lin, int col){
@@ -149,8 +153,8 @@ void NReturn::analyze(TreeAnalyzer *analyzer)
     exp->analyze(analyzer);
 }
 
-void NReturn::genCode(){
-    irGen->genCode(this);
+IRNode NReturn::genCode(){
+    return irGen->genCode(this);
 }
 
 NIdentifier::NIdentifier(char *identifier, int lin, int col)
@@ -172,8 +176,8 @@ void NIdentifier::analyze(TreeAnalyzer *analyzer)
     analyzer->visit(this);
 }
 
-void NIdentifier::genCode(){
-    irGen->genCode(this);
+IRNode NIdentifier::genCode(){
+    return irGen->genCode(this);
 }
 
 NAssign::NAssign(NIdentifier *identifier, NExpression *exp, int lin, int col){
@@ -197,8 +201,8 @@ void NAssign::analyze(TreeAnalyzer *analyzer){
     exp->analyze(analyzer);
 }
 
-void NAssign::genCode(){
-    irGen->genCode(this);
+IRNode NAssign::genCode(){
+    return irGen->genCode(this);
 }
 
 NIf::NIf(NExpression *cond, NExpression *trueExp, NExpression *falseExp, int lin, int col){
@@ -230,8 +234,8 @@ void NIf::analyze(TreeAnalyzer *analyzer){
         falseExp->analyze(analyzer);
 }
 
-void NIf::genCode(){
-    irGen->genCode(this);
+IRNode NIf::genCode(){
+    return irGen->genCode(this);
 }
 
 NWhile::NWhile(NExpression *cond, NExpression *body, int lin, int col){
@@ -251,15 +255,13 @@ string NWhile::toString(){
 
 void NWhile::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
-
     cond->analyze(analyzer);
     body->analyze(analyzer);
-
     analyzer->exitLoop();
 }
 
-void NWhile::genCode(){
-    irGen->genCode(this);
+IRNode NWhile::genCode(){
+    return irGen->genCode(this);
 }
 
 NFor::NFor(NIdentifier *identifier, NExpression *initExp, NExpression *endExp, NExpression *body, int lin, int col){
@@ -291,8 +293,8 @@ void NFor::analyze(TreeAnalyzer *analyzer){
     analyzer->exitLoop();
 }
 
-void NFor::genCode(){
-    irGen->genCode(this);
+IRNode NFor::genCode(){
+    return irGen->genCode(this);
 }
 
 NBreak::NBreak(int lin, int col){
@@ -310,8 +312,8 @@ void NBreak::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
 }
 
-void NBreak::genCode(){
-    irGen->genCode(this);
+IRNode NBreak::genCode(){
+    return irGen->genCode(this);
 }
 
 NArrayCreation::NArrayCreation(NIdentifier *identifier, int dimension, int lin, int col){
@@ -336,8 +338,8 @@ void NArrayCreation::analyze(TreeAnalyzer *analyzer){
     analyzer->visit(this);
 }
 
-void NArrayCreation::genCode(){
-    irGen->genCode(this);
+IRNode NArrayCreation::genCode(){
+    return irGen->genCode(this);
 }
 
 NArray::NArray(NIdentifier *identifier, vector <NExpression*> *indexList, int lin, int col){
@@ -369,8 +371,8 @@ void NArray::analyze(TreeAnalyzer *analyzer){
         indexList->at(i)->analyze(analyzer);
 }
 
-void NArray::genCode(){
-    irGen->genCode(this);
+IRNode NArray::genCode(){
+    return irGen->genCode(this);
 }
 
 NArrayAssign::NArrayAssign(NArray *array, NExpression *exp, int lin, int col){
@@ -397,8 +399,8 @@ void NArrayAssign::analyze(TreeAnalyzer *analyzer){
     exp->analyze(analyzer);
 }
 
-void NArrayAssign::genCode(){
-    irGen->genCode(this);
+IRNode NArrayAssign::genCode(){
+    return irGen->genCode(this);
 }
 
 NFunctionCall::NFunctionCall(NIdentifier *identifier, vector<NExpression*> *args, int lin, int col){
@@ -428,8 +430,8 @@ void NFunctionCall::analyze(TreeAnalyzer *analyzer){
             args->at(i)->analyze(analyzer);
 }
 
-void NFunctionCall::genCode(){
-    irGen->genCode(this);
+IRNode NFunctionCall::genCode(){
+    return irGen->genCode(this);
 }
 
 NExpressionList::NExpressionList(vector<NExpression*> *expList, int lin, int col){
@@ -457,8 +459,8 @@ void NExpressionList::analyze(TreeAnalyzer *analyzer){
 
 }
 
-void NExpressionList::genCode(){
-    irGen->genCode(this);
+IRNode NExpressionList::genCode(){
+    return irGen->genCode(this);
 }
 
 NFunctionDec::NFunctionDec(NIdentifier *identifier, vector<NIdentifier*> *args, NExpression *exp, int lin, int col){
@@ -490,8 +492,8 @@ void NFunctionDec::analyze(TreeAnalyzer *analyzer){
     analyzer->eraseScope();
 }
 
-void NFunctionDec::genCode(){
-    irGen->genCode(this);
+IRNode NFunctionDec::genCode(){
+    return irGen->genCode(this);
 }
 
 NImport::NImport(NIdentifier *identifier, int lin, int col){
@@ -511,6 +513,6 @@ void NImport::analyze(TreeAnalyzer *analyzer){
     identifier->analyze(analyzer);
 }
 
-void NImport::genCode(){
-    irGen->genCode(this);
+IRNode NImport::genCode(){
+    return irGen->genCode(this);
 }
