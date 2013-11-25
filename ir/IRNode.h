@@ -78,17 +78,26 @@ class IRCall : public IRExp
         virtual string toString();
 };
 
-class IREsec : public IRExp
+class IREseq : public IRExp
 {
     public:
         IRStm *stm;
         IRExp *exp;
 
     public:
-        IREsec(IRStm *stm, IRExp *exp);
+        IREseq(IRStm *stm, IRExp *exp);
         virtual string toString();
 };
 
+class IRExpList : public IRExp
+{
+    public:
+        vector <IRExp*> *exps;
+    
+    public:
+        IRExpList(vector <IRExp*> *exps);
+	virtual string toString();
+};
 
 class IRMove : public IRStm
 {

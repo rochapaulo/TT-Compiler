@@ -76,18 +76,34 @@ string IRCall::toString(){
 }
 
 
-IREsec::IREsec(IRStm *stm, IRExp *exp){
+IREseq::IREseq(IRStm *stm, IRExp *exp){
     this->stm = stm;
     this->exp = exp;
 }
 
-string IREsec::toString(){
+string IREseq::toString(){
     stringstream stream;
     stream << "<ESEQ>\n";
     stream << stm->toString();
     stream << exp->toString();
     stream << "</ESEQ>\n";
     return stream.str();
+}
+
+IRExpList::IRExpList(vector <IRExp*> *exps){
+    this->exps = exps;
+}
+
+string IRExpList::toString(){
+    stringstream stream;
+    stream << "<EXPLIST>\n";
+    for (int i = 0; i < exps->size(); i++)
+        stream << exps->at(i)->toString();
+
+    stream << "<EXPLIST>\n";
+
+    return stream.str();
+
 }
 
 IRMove::IRMove(IRExp *dst, IRExp *src){
