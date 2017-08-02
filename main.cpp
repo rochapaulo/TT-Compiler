@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
         ast_program->analyze(analyzer);
 
         cout << "Generating Intermediate Code ..." << endl;
-        vector<IRNode*> irNodeList = irGen->getIntermediateCode(ast_program);
+        //vector<IRNode*> irNodeList = irGen->getIntermediateCode(ast_program);
 
         cout << "Analyze complete." << endl;
     }
