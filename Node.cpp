@@ -3,7 +3,7 @@
 #include <iostream>
 
 IRTreeGen *irGen;
-vector<IRNode*> irNodeList;
+vector<IRNode> irNodeList;
 
 void Node::setLine(int lin){
     this->lin = lin;

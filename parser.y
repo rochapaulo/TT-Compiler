@@ -2,6 +2,7 @@
 
 #include "Node.h"
 #include <cstdlib>
+#include <stdio.h>
 
 extern int yylex();
 extern int yywrap();
