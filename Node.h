@@ -2,7 +2,7 @@
 #include <string>
 #include <sstream>
 #include "TreeAnalyzer.h"
-#include "IRTreeGen.h"
+#include "IRCodeGen.h"
 #include "IRNode.h"
 
 class Node;
@@ -28,7 +28,7 @@ class NFunctionDec;
 class NImport;
 
 using namespace std;
-extern IRTreeGen *irGen;
+extern IRCodeGen *irGen;
 
 class Node
 {

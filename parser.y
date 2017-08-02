@@ -24,7 +24,7 @@ AST_Program* ast_program;
     int                 	integer;
     int	    	        	op;
     NExpression         	*exp;
-    NArray			*array;
+    NArray			        *array;
     NStatement          	*dec;
     NIdentifier            	*identifier;
     vector<NExpression*>	*exps;

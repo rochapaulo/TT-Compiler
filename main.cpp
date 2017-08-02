@@ -13,7 +13,7 @@ using namespace std;
 extern AST_Program * ast_program;
 extern FILE *yyin, *yyout;
 extern int yyparse();
-extern IRTreeGen *irGen;
+extern IRCodeGen *irGen;
 
 TreeAnalyzer *analyzer;
 

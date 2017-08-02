@@ -3,7 +3,7 @@ BISON = bison
 FLEX = flex
 EXEC = parser
 PATHS = -I./ir -I./analyzer -I./
-FILES = parser.cpp lex.yy.c Node.cpp ./ir/IRNode.cpp ./analyzer/TreeAnalyzer.cpp ./ir/IRTreeGen.cpp main.cpp
+FILES = parser.cpp lex.yy.c Node.cpp ./ir/IRNode.cpp ./analyzer/TreeAnalyzer.cpp ./ir/IRCodeGen.cpp main.cpp
 
 all: $(EXEC) clean
 

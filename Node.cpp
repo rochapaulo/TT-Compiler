@@ -1,8 +1,8 @@
 #include "Node.h"
-#include "IRTreeGen.h"
+#include "IRCodeGen.h"
 #include <iostream>
 
-IRTreeGen *irGen;
+IRCodeGen *irGen;
 vector<IRNode> irNodeList;
 
 void Node::setLine(int lin){
@@ -38,7 +38,7 @@ string AST_Program::toString(){
 
         for (int i = 0; i < expList->size(); i++)
             stream << expList->at(i)->toString();
-        stream << "<EXPRESSION_SECTION>\n";
+        stream << "</EXPRESSION_SECTION>\n";
     };
 
     stream << "</AST_PROGRAM>\n";

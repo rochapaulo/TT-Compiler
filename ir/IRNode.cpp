@@ -172,5 +172,3 @@ string IRLabel::toString(){
     stream << "<LABEL>" << label << "</LABEL>\n";
     return stream.str();
 }
-
-
