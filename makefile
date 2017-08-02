@@ -8,8 +8,7 @@ FILES = parser.cpp lex.yy.c Node.cpp ./ir/IRNode.cpp ./analyzer/TreeAnalyzer.cpp
 all: $(EXEC) clean
 
 parser.cpp: parser.y
-	@$(BISON) -d -o parser.cpp parser.y
-	@if [ -a parser.hpp ]; then mv parser.hpp parser.h; fi;
+	@$(BISON) -d -o parser.cpp parser.y && mv ./parser.hpp parser.h
 
 lex.yy.c: scanner.l
 	@$(FLEX) scanner.l
